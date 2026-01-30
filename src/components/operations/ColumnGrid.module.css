@@ -2,18 +2,42 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 20px 0;
   gap: 4px;
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
+}
+
+.scrollWrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 16px 20px;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-muted) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scrollWrapper::-webkit-scrollbar {
+  height: 4px;
+}
+
+.scrollWrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollWrapper::-webkit-scrollbar-thumb {
+  background: var(--color-text-muted);
+  border-radius: 2px;
 }
 
 .grid {
   display: grid;
   gap: 4px;
   position: relative;
+  margin: 0 auto;
+  width: fit-content;
 }
 
 .row {
