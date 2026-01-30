@@ -75,6 +75,12 @@
   animation: popIn 0.3s ease forwards;
 }
 
+.carryTentative {
+  opacity: 0.5;
+  animation: pulse 1s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(255, 204, 2, 0.3);
+}
+
 .borrow {
   width: 32px;
   height: 32px;

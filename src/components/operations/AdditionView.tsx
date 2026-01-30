@@ -14,7 +14,12 @@ export function AdditionView({ errorStepId }: AdditionViewProps) {
 
   const cells = useMemo(() => {
     if (!problemState) return [];
-    return getAdditionGridCells(problemState.problem.operands, problemState.steps, difficulty === 'easy');
+    return getAdditionGridCells(
+      problemState.problem.operands,
+      problemState.steps,
+      difficulty === 'easy',
+      difficulty === 'medium' ? problemState.pendingFirstDigit : null
+    );
   }, [problemState, difficulty]);
 
   const layout = useMemo(() => {

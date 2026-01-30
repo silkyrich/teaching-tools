@@ -33,6 +33,8 @@ export interface StepInput {
   enteredValue: number | null;
   status: 'pending' | 'active' | 'completed';
   label?: string;
+  linkedStepId?: string;
+  compoundValue?: number;
 }
 
 export interface ProblemState {
@@ -43,6 +45,7 @@ export interface ProblemState {
   isComplete: boolean;
   startedAt: number;
   completedAt: number | null;
+  pendingFirstDigit: number | null;
 }
 
 export interface GridCell {
@@ -51,7 +54,7 @@ export interface GridCell {
   layer: 'main' | 'carry' | 'borrow' | 'working';
   content: string;
   editable: boolean;
-  status: 'fixed' | 'pending' | 'active' | 'completed' | 'hidden';
+  status: 'fixed' | 'pending' | 'active' | 'completed' | 'hidden' | 'tentative';
   type?: StepType;
   stepId?: string;
 }

@@ -71,15 +71,19 @@ export function generateSubtractionSteps(a: number, b: number): StepInput[] {
         workingA[i] = topDigit;
       }
 
-      // Borrow step
+      // Borrow step — will be linked to the answer step that follows
+      const borrowStepId = `step-${stepIndex++}`;
+      // Answer step ID is predictable (next index)
+      const linkedAnswerStepId = `step-${stepIndex}`;
       steps.push({
-        id: `step-${stepIndex++}`,
+        id: borrowStepId,
         type: 'borrow',
         position: { row: layout.borrowRow, col, layer: 'borrow' },
         correctValue: topDigit,
         enteredValue: null,
         status: 'pending',
         label: `${topDigit}`,
+        linkedStepId: linkedAnswerStepId,
       });
     }
 

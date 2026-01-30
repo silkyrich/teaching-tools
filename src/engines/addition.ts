@@ -58,13 +58,15 @@ export function generateAdditionSteps(operands: number[]): StepInput[] {
     const col = i + 1 + (layout.cols - 1 - maxLen);
 
     // Step: answer digit
+    const answerStepId = `step-${stepIndex++}`;
     steps.push({
-      id: `step-${stepIndex++}`,
+      id: answerStepId,
       type: 'answer_digit',
       position: { row: layout.answerRow, col, layer: 'main' },
       correctValue: answerDigit,
       enteredValue: null,
       status: 'pending',
+      compoundValue: newCarry > 0 ? columnSum : undefined,
     });
 
     // Step: carry digit (if needed)
@@ -77,6 +79,7 @@ export function generateAdditionSteps(operands: number[]): StepInput[] {
         correctValue: newCarry,
         enteredValue: null,
         status: 'pending',
+        linkedStepId: answerStepId,
       });
     }
 
@@ -101,7 +104,8 @@ export function generateAdditionSteps(operands: number[]): StepInput[] {
 export function getAdditionGridCells(
   operands: number[],
   steps: StepInput[],
-  showHints?: boolean
+  showHints?: boolean,
+  pendingFirstDigit?: number | null
 ): GridCell[] {
   const allDigits = operands.map(n => toDigits(n));
   const maxLen = Math.max(...allDigits.map(d => d.length));
@@ -145,18 +149,32 @@ export function getAdditionGridCells(
   }
 
   // Step-based cells (answer digits and carries)
+  // Build a set of active answer step IDs for tentative carry lookup
+  const activeAnswerStepId = steps.find(s => s.status === 'active' && s.type === 'answer_digit')?.id;
+
   for (const step of steps) {
     const isCompleted = step.status === 'completed';
     const isActive = step.status === 'active';
+
+    // Check if this is a carry step linked to the currently active answer step with a pending first digit
+    const isTentative = step.type === 'carry'
+      && step.linkedStepId === activeAnswerStepId
+      && pendingFirstDigit != null
+      && step.status === 'pending';
+
     cells.push({
       row: step.position.row,
       col: step.position.col,
       layer: step.position.layer,
       content: isCompleted ? String(step.correctValue)
+             : isTentative ? String(pendingFirstDigit)
              : (showHints && isActive) ? String(step.correctValue)
              : '',
       editable: true,
-      status: isActive ? 'active' : isCompleted ? 'completed' : 'pending',
+      status: isTentative ? 'tentative'
+             : isActive ? 'active'
+             : isCompleted ? 'completed'
+             : 'pending',
       type: step.type,
       stepId: step.id,
     });

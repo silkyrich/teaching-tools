@@ -65,7 +65,7 @@ export function ColumnGrid({
           ) : (
             <div style={{ width: 56, height: 56 }} />
           )}
-          {r === 1 && carryCell && carryCell.status !== 'pending' && (
+          {r === 1 && carryCell && (carryCell.status === 'completed' || carryCell.status === 'active' || carryCell.status === 'tentative') && (
             <DigitCell cell={carryCell} showError={carryCell.stepId === errorStepId} />
           )}
         </div>

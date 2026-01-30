@@ -80,6 +80,31 @@ describe('generateAdditionSteps', () => {
     expect(steps[2].type).toBe('answer_digit');
     expect(steps[2].correctValue).toBe(8);
   });
+
+  it('carry steps have linkedStepId pointing to preceding answer step', () => {
+    const steps = generateAdditionSteps([45, 38]);
+    const answerStep = steps[0]; // answer_digit for ones column
+    const carryStep = steps[1]; // carry for ones column
+
+    expect(carryStep.linkedStepId).toBe(answerStep.id);
+    expect(answerStep.linkedStepId).toBeUndefined();
+  });
+
+  it('answer steps with carry have compoundValue set to column sum', () => {
+    const steps = generateAdditionSteps([45, 38]);
+    // ones: 5+8=13, answer=3, carry=1
+    expect(steps[0].compoundValue).toBe(13);
+    // tens: 4+3+1=8, no carry
+    expect(steps[2].compoundValue).toBeUndefined();
+  });
+
+  it('no compoundValue when no carry needed', () => {
+    const steps = generateAdditionSteps([12, 34]);
+    for (const step of steps) {
+      expect(step.compoundValue).toBeUndefined();
+      expect(step.linkedStepId).toBeUndefined();
+    }
+  });
 });
 
 describe('multi-operand addition', () => {

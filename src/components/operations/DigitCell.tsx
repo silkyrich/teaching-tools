@@ -27,6 +27,7 @@ export function DigitCell({ cell, showError }: DigitCellProps) {
     isCarry && styles.carry,
     isCarry && cell.status === 'active' && styles.carryActive,
     isCarry && cell.status === 'completed' && styles.carryCompleted,
+    isCarry && cell.status === 'tentative' && styles.carryTentative,
     isBorrow && styles.borrow,
     isOperator && styles.operator,
     !cell.editable && !isCarry && !isBorrow && styles.fixed,
