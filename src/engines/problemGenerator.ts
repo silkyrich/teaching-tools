@@ -111,8 +111,9 @@ function generateMultiplicationProblem(digitCount: number, numberSize?: NumberSi
   const min = Math.pow(10, Math.max(1, digitCount - 1));
   const max = Math.pow(10, digitCount) - 1;
   const a = randomInt(min, max);
-  const maxMultiplier = numberSize === 'small' ? 5 : 12;
-  const b = randomInt(2, maxMultiplier);
+  const maxMultiplier = numberSize === 'small' ? 5 : numberSize === 'large' ? 20 : 12;
+  const minMultiplier = numberSize === 'large' ? 5 : 2;
+  const b = randomInt(minMultiplier, maxMultiplier);
 
   return {
     id: generateId(),
@@ -123,7 +124,7 @@ function generateMultiplicationProblem(digitCount: number, numberSize?: NumberSi
 }
 
 function generateShortDivisionProblem(digitCount: number, numberSize?: NumberSize): Problem {
-  const maxDivisor = numberSize === 'small' ? 4 : 9;
+  const maxDivisor = numberSize === 'small' ? 4 : numberSize === 'large' ? 12 : 9;
   const divisor = randomInt(2, maxDivisor);
   const min = Math.pow(10, digitCount - 1);
   const max = Math.pow(10, digitCount) - 1;
