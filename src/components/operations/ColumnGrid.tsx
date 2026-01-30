@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import styles from './ColumnGrid.module.css';
 import { DigitCell } from './DigitCell';
 import type { GridCell } from '../../engines/types';
