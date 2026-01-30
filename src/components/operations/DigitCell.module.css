@@ -1,0 +1,90 @@
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-display);
+  font-size: 28px;
+  transition: all var(--transition-fast);
+  user-select: none;
+  position: relative;
+}
+
+.fixed {
+  color: var(--color-text);
+}
+
+.operator {
+  color: var(--color-operator);
+  font-size: 24px;
+}
+
+.editable {
+  background: var(--color-digit-cell-bg);
+  border: 2px solid var(--color-digit-cell-border);
+  min-height: 56px;
+}
+
+.pending {
+  opacity: 0.3;
+  border-style: dashed;
+}
+
+.active {
+  background: var(--color-digit-cell-active-bg);
+  border-color: var(--color-digit-cell-active-border);
+  animation: pulse 1.5s ease-in-out infinite;
+  box-shadow: var(--shadow-glow);
+}
+
+.completed {
+  background: var(--color-digit-cell-completed-bg);
+  border-color: var(--color-success);
+  color: var(--color-success);
+  animation: popIn 0.3s ease forwards;
+}
+
+.error {
+  background: var(--color-error-bg);
+  border-color: var(--color-error);
+  color: var(--color-error);
+  animation: shake 0.4s ease;
+}
+
+.carry {
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  color: var(--color-carry);
+  background: var(--color-carry-bg);
+  border: 1.5px solid var(--color-carry);
+  border-radius: 6px;
+  position: absolute;
+  top: -16px;
+  right: -8px;
+}
+
+.carryActive {
+  animation: pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(255, 204, 2, 0.4);
+}
+
+.carryCompleted {
+  animation: popIn 0.3s ease forwards;
+}
+
+.borrow {
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  color: var(--color-borrow);
+  background: var(--color-borrow-bg);
+  border: 1.5px solid var(--color-borrow);
+  border-radius: 6px;
+}
+
+.hidden {
+  visibility: hidden;
+}

@@ -1,0 +1,37 @@
+[data-theme="forest"] {
+  --color-bg: #1a2e1a;
+  --color-bg-gradient: linear-gradient(180deg, #1a2e1a 0%, #0f1f0f 100%);
+  --color-surface: #2d4a2d;
+  --color-surface-raised: #3a5c3a;
+  --color-primary: #4caf50;
+  --color-primary-hover: #66bb6a;
+  --color-primary-light: #81c784;
+  --color-accent: #ffcc02;
+  --color-accent-light: #ffe066;
+  --color-text: #e8f5e9;
+  --color-text-muted: #a5d6a7;
+  --color-text-on-primary: #1a2e1a;
+  --color-digit-cell-bg: #2a4a2a;
+  --color-digit-cell-border: #4caf50;
+  --color-digit-cell-active-bg: #3a6a3a;
+  --color-digit-cell-active-border: #66bb6a;
+  --color-digit-cell-completed-bg: #2d5a2d;
+  --color-carry: #ffcc02;
+  --color-carry-bg: rgba(255, 204, 2, 0.15);
+  --color-borrow: #ff9800;
+  --color-borrow-bg: rgba(255, 152, 0, 0.15);
+  --color-error: #ef5350;
+  --color-error-bg: rgba(239, 83, 80, 0.15);
+  --color-success: #66bb6a;
+  --color-success-bg: rgba(102, 187, 106, 0.15);
+  --color-line: #4caf50;
+  --color-numpad-bg: #243824;
+  --color-numpad-button: #3a5c3a;
+  --color-numpad-button-hover: #4a6c4a;
+  --color-numpad-button-active: #2d4a2d;
+  --color-numpad-button-text: #e8f5e9;
+  --color-operator: #81c784;
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 12px rgba(76, 175, 80, 0.3);
+}
