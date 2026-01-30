@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { ColumnGrid } from './ColumnGrid';
 import { getLongDivisionLayout, getLongDivisionGridCells, getLongDivisionTotalRows } from '../../engines/longDivision';
 import { useProblemStore } from '../../stores/problemStore';
+import { useUiStore } from '../../stores/uiStore';
 
 interface LongDivisionViewProps {
   errorStepId?: string | null;
@@ -9,12 +10,13 @@ interface LongDivisionViewProps {
 
 export function LongDivisionView({ errorStepId }: LongDivisionViewProps) {
   const problemState = useProblemStore(s => s.problemState);
+  const difficulty = useUiStore(s => s.difficulty);
 
   const cells = useMemo(() => {
     if (!problemState) return [];
     const [divisor, dividend] = problemState.problem.operands;
-    return getLongDivisionGridCells(divisor, dividend, problemState.steps);
-  }, [problemState]);
+    return getLongDivisionGridCells(divisor, dividend, problemState.steps, difficulty === 'easy');
+  }, [problemState, difficulty]);
 
   const layoutInfo = useMemo(() => {
     if (!problemState) return null;

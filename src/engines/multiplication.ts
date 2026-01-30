@@ -116,7 +116,8 @@ export function generateMultiplicationSteps(a: number, b: number): StepInput[] {
 export function getMultiplicationGridCells(
   a: number,
   b: number,
-  steps: StepInput[]
+  steps: StepInput[],
+  showHints?: boolean
 ): GridCell[] {
   const digitsA = toDigits(a);
   const digitsB = toDigits(b);
@@ -167,7 +168,9 @@ export function getMultiplicationGridCells(
       row: step.position.row,
       col: step.position.col,
       layer: step.position.layer,
-      content: isCompleted ? String(step.correctValue) : '',
+      content: isCompleted ? String(step.correctValue)
+             : (showHints && isActive) ? String(step.correctValue)
+             : '',
       editable: true,
       status: isActive ? 'active' : isCompleted ? 'completed' : 'pending',
       type: step.type,

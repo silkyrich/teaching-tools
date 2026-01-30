@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { ColumnGrid } from './ColumnGrid';
 import { getAdditionLayout, getAdditionGridCells } from '../../engines/addition';
 import { useProblemStore } from '../../stores/problemStore';
+import { useUiStore } from '../../stores/uiStore';
 
 interface AdditionViewProps {
   errorStepId?: string | null;
@@ -9,27 +10,28 @@ interface AdditionViewProps {
 
 export function AdditionView({ errorStepId }: AdditionViewProps) {
   const problemState = useProblemStore(s => s.problemState);
+  const difficulty = useUiStore(s => s.difficulty);
 
   const cells = useMemo(() => {
     if (!problemState) return [];
-    const [a, b] = problemState.problem.operands;
-    return getAdditionGridCells(a, b, problemState.steps);
-  }, [problemState]);
+    return getAdditionGridCells(problemState.problem.operands, problemState.steps, difficulty === 'easy');
+  }, [problemState, difficulty]);
 
   const layout = useMemo(() => {
     if (!problemState) return null;
-    const [a, b] = problemState.problem.operands;
-    return getAdditionLayout(a, b);
+    return getAdditionLayout(problemState.problem.operands);
   }, [problemState]);
 
   if (!problemState || !layout) return null;
+
+  const lastOperandRow = layout.operandRows[layout.operandRows.length - 1];
 
   return (
     <ColumnGrid
       cells={cells}
       cols={layout.cols}
       rows={layout.rows}
-      lineAfterRow={layout.operandBRow}
+      lineAfterRow={lastOperandRow}
       currentStepIndex={problemState.currentStepIndex}
       totalSteps={problemState.steps.length}
       errorStepId={errorStepId}

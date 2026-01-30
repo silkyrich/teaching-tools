@@ -4,6 +4,7 @@ import type { Problem, ProblemState, StepInput, Difficulty } from '../engines/ty
 interface ProblemStore {
   problemState: ProblemState | null;
   startProblem: (problem: Problem, steps: StepInput[], difficulty: Difficulty) => void;
+  startProblemAtStep: (problem: Problem, steps: StepInput[], difficulty: Difficulty, stepIndex: number) => void;
   submitDigit: (digit: number) => 'correct' | 'incorrect' | 'ignored';
   nextStep: () => void;
   reset: () => void;
@@ -28,6 +29,31 @@ export const useProblemStore = create<ProblemStore>((set, get) => ({
         isComplete: false,
         startedAt: Date.now(),
         completedAt: null,
+      },
+    });
+  },
+
+  startProblemAtStep: (problem, steps, difficulty, stepIndex) => {
+    const clampedIndex = Math.min(stepIndex, steps.length);
+    const isComplete = clampedIndex >= steps.length;
+
+    const initialSteps = steps.map((s, i) => ({
+      ...s,
+      status: (i < clampedIndex ? 'completed'
+             : i === clampedIndex && !isComplete ? 'active'
+             : 'pending') as StepInput['status'],
+      enteredValue: i < clampedIndex ? s.correctValue : null,
+    }));
+
+    set({
+      problemState: {
+        problem,
+        difficulty,
+        steps: initialSteps,
+        currentStepIndex: isComplete ? clampedIndex - 1 : clampedIndex,
+        isComplete,
+        startedAt: Date.now(),
+        completedAt: isComplete ? Date.now() : null,
       },
     });
   },

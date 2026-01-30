@@ -133,7 +133,8 @@ export function getLongDivisionTotalRows(_divisor: number, dividend: number): nu
 export function getLongDivisionGridCells(
   divisor: number,
   dividend: number,
-  steps: StepInput[]
+  steps: StepInput[],
+  showHints?: boolean
 ): GridCell[] {
   const dividendDigits = toDigits(dividend);
   const divisorStr = String(divisor);
@@ -182,7 +183,9 @@ export function getLongDivisionGridCells(
       row: step.position.row,
       col: step.position.col,
       layer: step.position.layer,
-      content: isCompleted ? String(step.correctValue) : '',
+      content: isCompleted ? String(step.correctValue)
+             : (showHints && isActive) ? String(step.correctValue)
+             : '',
       editable: true,
       status: isActive ? 'active' : isCompleted ? 'completed' : 'pending',
       type: step.type,

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { ColumnGrid } from './ColumnGrid';
 import { getMultiplicationLayout, getMultiplicationGridCells } from '../../engines/multiplication';
 import { useProblemStore } from '../../stores/problemStore';
+import { useUiStore } from '../../stores/uiStore';
 
 interface MultiplicationViewProps {
   errorStepId?: string | null;
@@ -9,12 +10,13 @@ interface MultiplicationViewProps {
 
 export function MultiplicationView({ errorStepId }: MultiplicationViewProps) {
   const problemState = useProblemStore(s => s.problemState);
+  const difficulty = useUiStore(s => s.difficulty);
 
   const cells = useMemo(() => {
     if (!problemState) return [];
     const [a, b] = problemState.problem.operands;
-    return getMultiplicationGridCells(a, b, problemState.steps);
-  }, [problemState]);
+    return getMultiplicationGridCells(a, b, problemState.steps, difficulty === 'easy');
+  }, [problemState, difficulty]);
 
   const layout = useMemo(() => {
     if (!problemState) return null;

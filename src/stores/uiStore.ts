@@ -23,10 +23,18 @@ function loadTheme(): 'forest' | 'ocean' {
   return 'forest';
 }
 
+function loadDifficulty(): Difficulty {
+  try {
+    const saved = localStorage.getItem('maths-steps-difficulty');
+    if (saved === 'easy' || saved === 'medium' || saved === 'hard') return saved;
+  } catch {}
+  return 'medium';
+}
+
 export const useUiStore = create<UiStore>((set, get) => ({
   screen: 'home',
   theme: loadTheme(),
-  difficulty: 'medium',
+  difficulty: loadDifficulty(),
   operation: null,
 
   setScreen: (screen) => set({ screen }),
@@ -39,6 +47,9 @@ export const useUiStore = create<UiStore>((set, get) => ({
     const newTheme = get().theme === 'forest' ? 'ocean' : 'forest';
     get().setTheme(newTheme);
   },
-  setDifficulty: (difficulty) => set({ difficulty }),
+  setDifficulty: (difficulty) => {
+    localStorage.setItem('maths-steps-difficulty', difficulty);
+    set({ difficulty });
+  },
   setOperation: (operation) => set({ operation }),
 }));

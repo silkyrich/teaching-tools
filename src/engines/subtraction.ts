@@ -101,7 +101,8 @@ export function generateSubtractionSteps(a: number, b: number): StepInput[] {
 export function getSubtractionGridCells(
   a: number,
   b: number,
-  steps: StepInput[]
+  steps: StepInput[],
+  showHints?: boolean
 ): GridCell[] {
   const digitsA = digits(a);
   const digitsB = digits(b);
@@ -161,7 +162,9 @@ export function getSubtractionGridCells(
       row: step.position.row,
       col: step.position.col,
       layer: step.position.layer,
-      content: isCompleted ? String(step.correctValue) : '',
+      content: isCompleted ? String(step.correctValue)
+             : (showHints && isActive) ? String(step.correctValue)
+             : '',
       editable: true,
       status: isActive ? 'active' : isCompleted ? 'completed' : 'pending',
       type: step.type,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Header } from './components/layout/Header';
 import { OperationPicker } from './components/problem-setup/OperationPicker';
 import { AdditionView } from './components/operations/AdditionView';
@@ -13,19 +13,20 @@ import { useProblemStore } from './stores/problemStore';
 import { useStepEngine } from './hooks/useStepEngine';
 import { useScore } from './hooks/useScore';
 import { useCelebration } from './hooks/useCelebration';
-import { generateProblem } from './engines/problemGenerator';
+import { generateProblem, createProblemFromOperands } from './engines/problemGenerator';
 import { generateAdditionSteps } from './engines/addition';
 import { generateSubtractionSteps } from './engines/subtraction';
 import { generateMultiplicationSteps } from './engines/multiplication';
 import { generateShortDivisionSteps } from './engines/shortDivision';
 import { generateLongDivisionSteps } from './engines/longDivision';
+import { parseUrlState, updateUrlState, clearUrlState } from './utils/urlState';
 import type { Operation } from './engines/types';
 import styles from './App.module.css';
 
 function getStepsForProblem(operation: Operation, operands: number[]) {
   switch (operation) {
     case 'addition':
-      return generateAdditionSteps(operands[0], operands[1]);
+      return generateAdditionSteps(operands);
     case 'subtraction':
       return generateSubtractionSteps(operands[0], operands[1]);
     case 'multiplication':
@@ -57,23 +58,71 @@ function OperationView({ errorStepId }: { errorStepId?: string | null }) {
 }
 
 function App() {
-  const { screen, setScreen, setOperation, difficulty } = useUiStore();
-  const { startProblem } = useProblemStore();
+  const { screen, setScreen, setOperation, difficulty, setDifficulty } = useUiStore();
+  const { startProblem, startProblemAtStep } = useProblemStore();
   const { problemState, handleDigit, handleNext, errorStepId, isEasyMode } = useStepEngine();
   const { score, recordCorrect } = useScore();
   const { celebrate } = useCelebration();
   const [showCelebration, setShowCelebration] = useState(false);
+  const urlInitDone = useRef(false);
 
+  // Apply theme on mount
   useEffect(() => {
     const theme = useUiStore.getState().theme;
     document.documentElement.dataset.theme = theme;
   }, []);
 
+  // Read URL state on mount
+  useEffect(() => {
+    if (urlInitDone.current) return;
+    urlInitDone.current = true;
+
+    const urlState = parseUrlState();
+    if (!urlState) return;
+
+    const { operation, operands, difficulty: urlDifficulty, step } = urlState;
+
+    if (urlDifficulty) {
+      setDifficulty(urlDifficulty);
+    }
+
+    const currentDifficulty = urlDifficulty ?? useUiStore.getState().difficulty;
+    setOperation(operation);
+
+    const problem = createProblemFromOperands(operation, operands);
+    const steps = getStepsForProblem(operation, problem.operands);
+
+    if (step && step > 0) {
+      startProblemAtStep(problem, steps, currentDifficulty, step);
+    } else {
+      startProblem(problem, steps, currentDifficulty);
+    }
+    setScreen('problem');
+  }, [setDifficulty, setOperation, startProblem, startProblemAtStep, setScreen]);
+
+  // Update URL whenever problem state changes
+  useEffect(() => {
+    if (!urlInitDone.current) return;
+
+    if (screen === 'home') {
+      clearUrlState();
+      return;
+    }
+
+    if (screen === 'problem' && problemState) {
+      const operation = problemState.problem.operation;
+      const operands = problemState.problem.operands;
+      const currentDifficulty = problemState.difficulty;
+      const stepIndex = problemState.currentStepIndex;
+      updateUrlState(operation, operands, currentDifficulty, stepIndex);
+    }
+  }, [screen, problemState?.currentStepIndex, problemState?.isComplete]);
+
   const handleSelectOperation = useCallback((operation: Operation) => {
     setOperation(operation);
     setShowCelebration(false);
 
-    const problem = generateProblem({ operation });
+    const problem = generateProblem({ operation, difficulty });
     const steps = getStepsForProblem(operation, problem.operands);
 
     startProblem(problem, steps, difficulty);

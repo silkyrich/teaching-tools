@@ -1,60 +1,60 @@
 import type { StepInput, GridCell } from './types';
 
-function digits(n: number): number[] {
+function toDigits(n: number): number[] {
   return String(n).split('').map(Number);
 }
 
 export interface AdditionLayout {
   rows: number;
   cols: number;
-  operandARow: number;
-  operandBRow: number;
+  operandRows: number[];
   answerRow: number;
   carryRow: number;
   operatorCol: number;
   lineRow: number;
 }
 
-export function getAdditionLayout(a: number, b: number): AdditionLayout {
-  const digitsA = digits(a);
-  const digitsB = digits(b);
-  const maxLen = Math.max(digitsA.length, digitsB.length);
+export function getAdditionLayout(operands: number[]): AdditionLayout {
+  const allDigits = operands.map(n => toDigits(n));
+  const maxLen = Math.max(...allDigits.map(d => d.length));
   const answerLen = maxLen + 1; // possible carry
   const cols = answerLen + 1; // +1 for operator column
+  const numOperands = operands.length;
+  const rows = 1 + numOperands + 1; // carry + operands + answer
+
+  const operandRows = Array.from({ length: numOperands }, (_, i) => i + 1);
 
   return {
-    rows: 4, // carry, operandA, operandB, answer
+    rows,
     cols,
     carryRow: 0,
-    operandARow: 1,
-    operandBRow: 2,
-    answerRow: 3,
+    operandRows,
+    answerRow: rows - 1,
     operatorCol: 0,
-    lineRow: 3, // line drawn above answer row
+    lineRow: rows - 1,
   };
 }
 
-export function generateAdditionSteps(a: number, b: number): StepInput[] {
-  const digitsA = digits(a);
-  const digitsB = digits(b);
-  const maxLen = Math.max(digitsA.length, digitsB.length);
+export function generateAdditionSteps(operands: number[]): StepInput[] {
+  const allDigits = operands.map(n => toDigits(n));
+  const maxLen = Math.max(...allDigits.map(d => d.length));
 
-  // Pad to equal length
-  while (digitsA.length < maxLen) digitsA.unshift(0);
-  while (digitsB.length < maxLen) digitsB.unshift(0);
+  // Pad all to equal length
+  for (const d of allDigits) {
+    while (d.length < maxLen) d.unshift(0);
+  }
 
-  const layout = getAdditionLayout(a, b);
+  const layout = getAdditionLayout(operands);
   const steps: StepInput[] = [];
   let carry = 0;
   let stepIndex = 0;
 
   // Work right-to-left through columns
   for (let i = maxLen - 1; i >= 0; i--) {
-    const sum = digitsA[i] + digitsB[i] + carry;
-    const answerDigit = sum % 10;
-    const newCarry = Math.floor(sum / 10);
+    const columnSum = allDigits.reduce((sum, d) => sum + d[i], 0) + carry;
+    const answerDigit = columnSum % 10;
+    const newCarry = Math.floor(columnSum / 10);
 
-    // The column in the grid (offset by 1 for operator column, right-aligned)
     const col = i + 1 + (layout.cols - 1 - maxLen);
 
     // Step: answer digit
@@ -84,7 +84,6 @@ export function generateAdditionSteps(a: number, b: number): StepInput[] {
   }
 
   // If there's a final carry that extends the answer (e.g. 999+1=1000)
-  // The carry was already placed; we need the leading answer digit
   if (carry > 0) {
     steps.push({
       id: `step-${stepIndex++}`,
@@ -100,23 +99,25 @@ export function generateAdditionSteps(a: number, b: number): StepInput[] {
 }
 
 export function getAdditionGridCells(
-  a: number,
-  b: number,
-  steps: StepInput[]
+  operands: number[],
+  steps: StepInput[],
+  showHints?: boolean
 ): GridCell[] {
-  const digitsA = digits(a);
-  const digitsB = digits(b);
-  const maxLen = Math.max(digitsA.length, digitsB.length);
-  const layout = getAdditionLayout(a, b);
+  const allDigits = operands.map(n => toDigits(n));
+  const maxLen = Math.max(...allDigits.map(d => d.length));
+  const layout = getAdditionLayout(operands);
 
-  while (digitsA.length < maxLen) digitsA.unshift(0);
-  while (digitsB.length < maxLen) digitsB.unshift(0);
+  // Pad all to equal length
+  for (const d of allDigits) {
+    while (d.length < maxLen) d.unshift(0);
+  }
 
   const cells: GridCell[] = [];
 
-  // Operator symbol
+  // Operator symbol on the last operand row
+  const lastOperandRow = layout.operandRows[layout.operandRows.length - 1];
   cells.push({
-    row: layout.operandBRow,
+    row: lastOperandRow,
     col: layout.operatorCol,
     layer: 'main',
     content: '+',
@@ -124,33 +125,22 @@ export function getAdditionGridCells(
     status: 'fixed',
   });
 
-  // Operand A digits
-  for (let i = 0; i < maxLen; i++) {
-    const col = i + 1 + (layout.cols - 1 - maxLen);
-    if (digitsA[i] !== 0 || i > 0) {
-      cells.push({
-        row: layout.operandARow,
-        col,
-        layer: 'main',
-        content: String(digitsA[i]),
-        editable: false,
-        status: 'fixed',
-      });
-    }
-  }
-
-  // Operand B digits
-  for (let i = 0; i < maxLen; i++) {
-    const col = i + 1 + (layout.cols - 1 - maxLen);
-    if (digitsB[i] !== 0 || i > 0) {
-      cells.push({
-        row: layout.operandBRow,
-        col,
-        layer: 'main',
-        content: String(digitsB[i]),
-        editable: false,
-        status: 'fixed',
-      });
+  // All operand digits
+  for (let opIdx = 0; opIdx < operands.length; opIdx++) {
+    const d = allDigits[opIdx];
+    const row = layout.operandRows[opIdx];
+    for (let i = 0; i < maxLen; i++) {
+      const col = i + 1 + (layout.cols - 1 - maxLen);
+      if (d[i] !== 0 || i > 0) {
+        cells.push({
+          row,
+          col,
+          layer: 'main',
+          content: String(d[i]),
+          editable: false,
+          status: 'fixed',
+        });
+      }
     }
   }
 
@@ -162,7 +152,9 @@ export function getAdditionGridCells(
       row: step.position.row,
       col: step.position.col,
       layer: step.position.layer,
-      content: isCompleted ? String(step.correctValue) : '',
+      content: isCompleted ? String(step.correctValue)
+             : (showHints && isActive) ? String(step.correctValue)
+             : '',
       editable: true,
       status: isActive ? 'active' : isCompleted ? 'completed' : 'pending',
       type: step.type,
@@ -172,4 +164,3 @@ export function getAdditionGridCells(
 
   return cells;
 }
-

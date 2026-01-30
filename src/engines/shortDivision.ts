@@ -90,7 +90,8 @@ export function generateShortDivisionSteps(divisor: number, dividend: number): S
 export function getShortDivisionGridCells(
   divisor: number,
   dividend: number,
-  steps: StepInput[]
+  steps: StepInput[],
+  showHints?: boolean
 ): GridCell[] {
   const dividendDigits = digits(dividend);
   const divisorStr = String(divisor);
@@ -138,7 +139,7 @@ export function getShortDivisionGridCells(
     const isActive = step.status === 'active';
 
     let content = '';
-    if (isCompleted) {
+    if (isCompleted || (showHints && isActive)) {
       content = step.label === 'r'
         ? `r${step.correctValue}`
         : String(step.correctValue);
