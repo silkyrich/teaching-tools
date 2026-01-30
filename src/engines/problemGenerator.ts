@@ -1,4 +1,4 @@
-import type { Problem, Operation, Difficulty } from './types';
+import type { Problem, Operation, NumberSize } from './types';
 
 let nextId = 0;
 
@@ -13,16 +13,16 @@ function generateId(): string {
 export interface ProblemConfig {
   operation: Operation;
   digitCount?: number;
-  difficulty?: Difficulty;
+  numberSize?: NumberSize;
   operandCount?: number; // for addition: 2-5
 }
 
 function getDigitCount(config: ProblemConfig): number {
   if (config.digitCount) return config.digitCount;
-  switch (config.difficulty ?? 'medium') {
-    case 'easy': return 2;
+  switch (config.numberSize ?? 'medium') {
+    case 'small': return 2;
     case 'medium': return 3;
-    case 'hard': return 4;
+    case 'large': return 4;
   }
 }
 
@@ -36,11 +36,11 @@ export function generateProblem(config: ProblemConfig): Problem {
     case 'subtraction':
       return generateSubtractionProblem(digitCount);
     case 'multiplication':
-      return generateMultiplicationProblem(digitCount, config.difficulty);
+      return generateMultiplicationProblem(digitCount, config.numberSize);
     case 'shortDivision':
-      return generateShortDivisionProblem(digitCount, config.difficulty);
+      return generateShortDivisionProblem(digitCount, config.numberSize);
     case 'longDivision':
-      return generateLongDivisionProblem(digitCount, config.difficulty);
+      return generateLongDivisionProblem(digitCount, config.numberSize);
   }
 }
 
@@ -107,11 +107,11 @@ function generateSubtractionProblem(digitCount: number): Problem {
   };
 }
 
-function generateMultiplicationProblem(digitCount: number, difficulty?: Difficulty): Problem {
+function generateMultiplicationProblem(digitCount: number, numberSize?: NumberSize): Problem {
   const min = Math.pow(10, Math.max(1, digitCount - 1));
   const max = Math.pow(10, digitCount) - 1;
   const a = randomInt(min, max);
-  const maxMultiplier = difficulty === 'easy' ? 5 : 12;
+  const maxMultiplier = numberSize === 'small' ? 5 : 12;
   const b = randomInt(2, maxMultiplier);
 
   return {
@@ -122,8 +122,8 @@ function generateMultiplicationProblem(digitCount: number, difficulty?: Difficul
   };
 }
 
-function generateShortDivisionProblem(digitCount: number, difficulty?: Difficulty): Problem {
-  const maxDivisor = difficulty === 'easy' ? 4 : 9;
+function generateShortDivisionProblem(digitCount: number, numberSize?: NumberSize): Problem {
+  const maxDivisor = numberSize === 'small' ? 4 : 9;
   const divisor = randomInt(2, maxDivisor);
   const min = Math.pow(10, digitCount - 1);
   const max = Math.pow(10, digitCount) - 1;
@@ -138,8 +138,8 @@ function generateShortDivisionProblem(digitCount: number, difficulty?: Difficult
   };
 }
 
-function generateLongDivisionProblem(digitCount: number, difficulty?: Difficulty): Problem {
-  const maxDivisor = difficulty === 'easy' ? 15 : difficulty === 'hard' ? 30 : 25;
+function generateLongDivisionProblem(digitCount: number, numberSize?: NumberSize): Problem {
+  const maxDivisor = numberSize === 'small' ? 15 : numberSize === 'large' ? 30 : 25;
   const divisor = randomInt(11, maxDivisor);
   const min = Math.pow(10, Math.max(2, digitCount - 1));
   const max = Math.pow(10, digitCount) - 1;

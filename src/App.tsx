@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Header } from './components/layout/Header';
 import { OperationPicker } from './components/problem-setup/OperationPicker';
+import { CustomNumberEntry } from './components/problem-setup/CustomNumberEntry';
 import { AdditionView } from './components/operations/AdditionView';
 import { SubtractionView } from './components/operations/SubtractionView';
 import { MultiplicationView } from './components/operations/MultiplicationView';
@@ -58,9 +59,10 @@ function OperationView({ errorStepId }: { errorStepId?: string | null }) {
 }
 
 function App() {
-  const { screen, setScreen, setOperation, difficulty, setDifficulty } = useUiStore();
+  const { screen, setScreen, setOperation, numberSize, support, inputMode,
+          setNumberSize, setSupport } = useUiStore();
   const { startProblem, startProblemAtStep } = useProblemStore();
-  const { problemState, handleDigit, handleNext, errorStepId, isEasyMode } = useStepEngine();
+  const { problemState, handleDigit, handleNext, errorStepId, isViewOnly } = useStepEngine();
   const { score, recordCorrect } = useScore();
   const { celebrate } = useCelebration();
   const [showCelebration, setShowCelebration] = useState(false);
@@ -80,31 +82,30 @@ function App() {
     const urlState = parseUrlState();
     if (!urlState) return;
 
-    const { operation, operands, difficulty: urlDifficulty, step } = urlState;
+    const { operation, operands, numberSize: urlNs, support: urlSup, step } = urlState;
 
-    if (urlDifficulty) {
-      setDifficulty(urlDifficulty);
-    }
+    if (urlNs) setNumberSize(urlNs);
+    if (urlSup) setSupport(urlSup);
 
-    const currentDifficulty = urlDifficulty ?? useUiStore.getState().difficulty;
+    const currentSupport = urlSup ?? useUiStore.getState().support;
     setOperation(operation);
 
     const problem = createProblemFromOperands(operation, operands);
     const steps = getStepsForProblem(operation, problem.operands);
 
     if (step && step > 0) {
-      startProblemAtStep(problem, steps, currentDifficulty, step);
+      startProblemAtStep(problem, steps, currentSupport, step);
     } else {
-      startProblem(problem, steps, currentDifficulty);
+      startProblem(problem, steps, currentSupport);
     }
     setScreen('problem');
-  }, [setDifficulty, setOperation, startProblem, startProblemAtStep, setScreen]);
+  }, [setNumberSize, setSupport, setOperation, startProblem, startProblemAtStep, setScreen]);
 
   // Update URL whenever problem state changes
   useEffect(() => {
     if (!urlInitDone.current) return;
 
-    if (screen === 'home') {
+    if (screen === 'home' || screen === 'customEntry') {
       clearUrlState();
       return;
     }
@@ -112,22 +113,36 @@ function App() {
     if (screen === 'problem' && problemState) {
       const operation = problemState.problem.operation;
       const operands = problemState.problem.operands;
-      const currentDifficulty = problemState.difficulty;
+      const currentSupport = problemState.support;
+      const currentNs = useUiStore.getState().numberSize;
       const stepIndex = problemState.currentStepIndex;
-      updateUrlState(operation, operands, currentDifficulty, stepIndex);
+      updateUrlState(operation, operands, currentNs, currentSupport, stepIndex);
     }
   }, [screen, problemState?.currentStepIndex, problemState?.isComplete]);
+
+  const startWithOperands = useCallback((operation: Operation, operands: number[]) => {
+    setShowCelebration(false);
+    const problem = createProblemFromOperands(operation, operands);
+    const steps = getStepsForProblem(operation, problem.operands);
+    startProblem(problem, steps, support);
+    setScreen('problem');
+  }, [support, startProblem, setScreen]);
 
   const handleSelectOperation = useCallback((operation: Operation) => {
     setOperation(operation);
     setShowCelebration(false);
 
-    const problem = generateProblem({ operation, difficulty });
+    if (inputMode === 'custom') {
+      setScreen('customEntry');
+      return;
+    }
+
+    const problem = generateProblem({ operation, numberSize });
     const steps = getStepsForProblem(operation, problem.operands);
 
-    startProblem(problem, steps, difficulty);
+    startProblem(problem, steps, support);
     setScreen('problem');
-  }, [difficulty, setOperation, startProblem, setScreen]);
+  }, [numberSize, support, inputMode, setOperation, startProblem, setScreen]);
 
   const handleNextProblem = useCallback(() => {
     setShowCelebration(false);
@@ -136,8 +151,14 @@ function App() {
       setScreen('home');
       return;
     }
+
+    if (inputMode === 'custom') {
+      setScreen('customEntry');
+      return;
+    }
+
     handleSelectOperation(operation);
-  }, [handleSelectOperation, setScreen]);
+  }, [inputMode, handleSelectOperation, setScreen]);
 
   useEffect(() => {
     if (problemState?.isComplete && !showCelebration) {
@@ -150,12 +171,22 @@ function App() {
     }
   }, [problemState?.isComplete]);
 
+  const currentOperation = useUiStore(s => s.operation);
+
   return (
     <div className={styles.app}>
       <Header />
       <div className={styles.content}>
         {screen === 'home' && (
           <OperationPicker onSelect={handleSelectOperation} />
+        )}
+
+        {screen === 'customEntry' && currentOperation && (
+          <CustomNumberEntry
+            operation={currentOperation}
+            onStart={(operands) => startWithOperands(currentOperation, operands)}
+            onBack={() => setScreen('home')}
+          />
         )}
 
         {screen === 'problem' && problemState && (
@@ -167,7 +198,7 @@ function App() {
               <NumberPad
                 onDigit={handleDigit}
                 onNext={handleNext}
-                showNext={isEasyMode}
+                showNext={isViewOnly}
                 disabled={problemState.isComplete}
               />
             </div>

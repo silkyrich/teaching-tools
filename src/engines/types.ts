@@ -1,6 +1,19 @@
 export type Operation = 'addition' | 'subtraction' | 'multiplication' | 'shortDivision' | 'longDivision';
 
+export type NumberSize = 'small' | 'medium' | 'large';
+export type Support = 'full' | 'some' | 'none';
+export type InputMode = 'random' | 'custom';
+
+// Legacy type kept for URL backwards compat
 export type Difficulty = 'easy' | 'medium' | 'hard';
+
+export function difficultyToSettings(d: Difficulty): { numberSize: NumberSize; support: Support } {
+  switch (d) {
+    case 'easy':   return { numberSize: 'small',  support: 'full' };
+    case 'medium': return { numberSize: 'medium', support: 'some' };
+    case 'hard':   return { numberSize: 'large',  support: 'none' };
+  }
+}
 
 export interface Problem {
   id: string;
@@ -39,7 +52,7 @@ export interface StepInput {
 
 export interface ProblemState {
   problem: Problem;
-  difficulty: Difficulty;
+  support: Support;
   steps: StepInput[];
   currentStepIndex: number;
   isComplete: boolean;

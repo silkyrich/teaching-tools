@@ -1,14 +1,18 @@
-import type { Operation, Difficulty } from '../engines/types';
+import type { Operation, NumberSize, Support, Difficulty } from '../engines/types';
+import { difficultyToSettings } from '../engines/types';
 
 const VALID_OPERATIONS: Operation[] = [
   'addition', 'subtraction', 'multiplication', 'shortDivision', 'longDivision'
 ];
+const VALID_NUMBER_SIZES: NumberSize[] = ['small', 'medium', 'large'];
+const VALID_SUPPORTS: Support[] = ['full', 'some', 'none'];
 const VALID_DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard'];
 
 export interface UrlState {
   operation: Operation;
   operands: number[];
-  difficulty?: Difficulty;
+  numberSize?: NumberSize;
+  support?: Support;
   step?: number;
 }
 
@@ -34,28 +38,48 @@ export function parseUrlState(): UrlState | null {
     if (operands.length !== 2) return null;
   }
 
-  const diffParam = params.get('d');
-  const difficulty = diffParam && VALID_DIFFICULTIES.includes(diffParam as Difficulty)
-    ? diffParam as Difficulty
-    : undefined;
+  // Parse new params (ns, sup)
+  const nsParam = params.get('ns');
+  const supParam = params.get('sup');
+  let numberSize: NumberSize | undefined;
+  let support: Support | undefined;
+
+  if (nsParam && VALID_NUMBER_SIZES.includes(nsParam as NumberSize)) {
+    numberSize = nsParam as NumberSize;
+  }
+  if (supParam && VALID_SUPPORTS.includes(supParam as Support)) {
+    support = supParam as Support;
+  }
+
+  // Backwards compat: parse old d= param
+  if (!numberSize || !support) {
+    const diffParam = params.get('d');
+    if (diffParam && VALID_DIFFICULTIES.includes(diffParam as Difficulty)) {
+      const mapped = difficultyToSettings(diffParam as Difficulty);
+      if (!numberSize) numberSize = mapped.numberSize;
+      if (!support) support = mapped.support;
+    }
+  }
 
   const stepParam = params.get('step');
   const step = stepParam !== null ? parseInt(stepParam, 10) : undefined;
   if (step !== undefined && (isNaN(step) || step < 0)) return null;
 
-  return { operation, operands, difficulty, step };
+  return { operation, operands, numberSize, support, step };
 }
 
 export function buildUrl(
   operation: Operation,
   operands: number[],
-  difficulty: Difficulty,
+  numberSize: NumberSize,
+  support: Support,
   step: number
 ): string {
   const params = new URLSearchParams();
   params.set('op', operation);
   params.set('nums', operands.join(','));
-  params.set('d', difficulty);
+  params.set('ns', numberSize);
+  params.set('sup', support);
   params.set('step', String(step));
   return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
 }
@@ -63,10 +87,11 @@ export function buildUrl(
 export function updateUrlState(
   operation: Operation,
   operands: number[],
-  difficulty: Difficulty,
+  numberSize: NumberSize,
+  support: Support,
   step: number
 ): void {
-  const url = buildUrl(operation, operands, difficulty, step);
+  const url = buildUrl(operation, operands, numberSize, support, step);
   window.history.replaceState({}, '', url);
 }
 

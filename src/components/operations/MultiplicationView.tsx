@@ -10,13 +10,13 @@ interface MultiplicationViewProps {
 
 export function MultiplicationView({ errorStepId }: MultiplicationViewProps) {
   const problemState = useProblemStore(s => s.problemState);
-  const difficulty = useUiStore(s => s.difficulty);
+  const support = useUiStore(s => s.support);
 
   const cells = useMemo(() => {
     if (!problemState) return [];
     const [a, b] = problemState.problem.operands;
-    return getMultiplicationGridCells(a, b, problemState.steps, difficulty === 'easy');
-  }, [problemState, difficulty]);
+    return getMultiplicationGridCells(a, b, problemState.steps, support === 'full');
+  }, [problemState, support]);
 
   const layout = useMemo(() => {
     if (!problemState) return null;

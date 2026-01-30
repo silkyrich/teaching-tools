@@ -10,17 +10,17 @@ interface AdditionViewProps {
 
 export function AdditionView({ errorStepId }: AdditionViewProps) {
   const problemState = useProblemStore(s => s.problemState);
-  const difficulty = useUiStore(s => s.difficulty);
+  const support = useUiStore(s => s.support);
 
   const cells = useMemo(() => {
     if (!problemState) return [];
     return getAdditionGridCells(
       problemState.problem.operands,
       problemState.steps,
-      difficulty === 'easy',
-      difficulty === 'medium' ? problemState.pendingFirstDigit : null
+      support === 'full',
+      support === 'some' ? problemState.pendingFirstDigit : null
     );
-  }, [problemState, difficulty]);
+  }, [problemState, support]);
 
   const layout = useMemo(() => {
     if (!problemState) return null;

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { useProblemStore } from '../problemStore';
 import { generateAdditionSteps } from '../../engines/addition';
 import { generateSubtractionSteps } from '../../engines/subtraction';
-import type { Problem, Difficulty } from '../../engines/types';
+import type { Problem, Support } from '../../engines/types';
 
 function makeAdditionProblem(operands: number[]): Problem {
   return {
@@ -22,12 +22,12 @@ function makeSubtractionProblem(a: number, b: number): Problem {
   };
 }
 
-function start(problem: Problem, difficulty: Difficulty) {
+function start(problem: Problem, support: Support) {
   const steps =
     problem.operation === 'addition'
       ? generateAdditionSteps(problem.operands)
       : generateSubtractionSteps(problem.operands[0], problem.operands[1]);
-  useProblemStore.getState().startProblem(problem, steps, difficulty);
+  useProblemStore.getState().startProblem(problem, steps, support);
 }
 
 function submit(digit: number) {
@@ -38,12 +38,12 @@ function state() {
   return useProblemStore.getState().problemState!;
 }
 
-describe('problemStore — medium addition compound entry', () => {
+describe('problemStore — some-support addition compound entry', () => {
   beforeEach(() => useProblemStore.getState().reset());
 
   it('accepts two-keystroke compound entry for carry columns', () => {
     // 45 + 38 = 83. Ones: 5+8=13 → compound
-    start(makeAdditionProblem([45, 38]), 'medium');
+    start(makeAdditionProblem([45, 38]), 'some');
 
     // First keystroke: tens digit of column sum (carry value)
     expect(submit(1)).toBe('correct');
@@ -63,7 +63,7 @@ describe('problemStore — medium addition compound entry', () => {
   });
 
   it('rejects wrong first digit in compound entry', () => {
-    start(makeAdditionProblem([45, 38]), 'medium');
+    start(makeAdditionProblem([45, 38]), 'some');
 
     // 5+8=13, first digit should be 1
     expect(submit(2)).toBe('incorrect');
@@ -71,7 +71,7 @@ describe('problemStore — medium addition compound entry', () => {
   });
 
   it('rejects wrong second digit and clears pending', () => {
-    start(makeAdditionProblem([45, 38]), 'medium');
+    start(makeAdditionProblem([45, 38]), 'some');
 
     expect(submit(1)).toBe('correct'); // correct first digit
     expect(submit(5)).toBe('incorrect'); // wrong second digit (15 !== 13)
@@ -79,7 +79,7 @@ describe('problemStore — medium addition compound entry', () => {
   });
 
   it('skips carry step after compound entry and advances to next answer', () => {
-    start(makeAdditionProblem([45, 38]), 'medium');
+    start(makeAdditionProblem([45, 38]), 'some');
 
     // Enter compound 13 for ones column
     submit(1);
@@ -92,7 +92,7 @@ describe('problemStore — medium addition compound entry', () => {
   });
 
   it('completes problem after all columns entered', () => {
-    start(makeAdditionProblem([45, 38]), 'medium');
+    start(makeAdditionProblem([45, 38]), 'some');
 
     // Ones: 5+8=13 compound
     submit(1);
@@ -105,7 +105,7 @@ describe('problemStore — medium addition compound entry', () => {
 
   it('handles column sum < 10 as single digit (no compound)', () => {
     // 12 + 34 = 46, no carries
-    start(makeAdditionProblem([12, 34]), 'medium');
+    start(makeAdditionProblem([12, 34]), 'some');
 
     expect(submit(6)).toBe('correct'); // ones: 2+4=6
     expect(submit(4)).toBe('correct'); // tens: 1+3=4
@@ -113,7 +113,7 @@ describe('problemStore — medium addition compound entry', () => {
   });
 
   it('handles multi-column carries: 347 + 185 = 532', () => {
-    start(makeAdditionProblem([347, 185]), 'medium');
+    start(makeAdditionProblem([347, 185]), 'some');
 
     // Ones: 7+5=12 compound
     submit(1);
@@ -129,12 +129,12 @@ describe('problemStore — medium addition compound entry', () => {
   });
 });
 
-describe('problemStore — medium subtraction auto-borrow', () => {
+describe('problemStore — some-support subtraction auto-borrow', () => {
   beforeEach(() => useProblemStore.getState().reset());
 
   it('skips borrow step and starts on answer step', () => {
     // 83 - 45: ones column needs borrow. Steps: borrow(13) → answer(8) → answer(3)
-    start(makeSubtractionProblem(83, 45), 'medium');
+    start(makeSubtractionProblem(83, 45), 'some');
 
     // Should skip borrow step and start on the first answer step
     const current = state().steps[state().currentStepIndex];
@@ -142,7 +142,7 @@ describe('problemStore — medium subtraction auto-borrow', () => {
   });
 
   it('auto-completes borrow when answer digit is entered correctly', () => {
-    start(makeSubtractionProblem(83, 45), 'medium');
+    start(makeSubtractionProblem(83, 45), 'some');
 
     // Enter ones answer: 13-5=8
     expect(submit(8)).toBe('correct');
@@ -154,7 +154,7 @@ describe('problemStore — medium subtraction auto-borrow', () => {
   });
 
   it('completes subtraction with borrow', () => {
-    start(makeSubtractionProblem(83, 45), 'medium');
+    start(makeSubtractionProblem(83, 45), 'some');
 
     submit(8); // ones: 13-5=8 (auto-borrow)
     expect(submit(3)).toBe('correct'); // tens: (8-1)-4=3
@@ -163,7 +163,7 @@ describe('problemStore — medium subtraction auto-borrow', () => {
 
   it('handles subtraction without borrow as single digits', () => {
     // 86 - 42 = 44, no borrows
-    start(makeSubtractionProblem(86, 42), 'medium');
+    start(makeSubtractionProblem(86, 42), 'some');
 
     expect(submit(4)).toBe('correct'); // ones: 6-2=4
     expect(submit(4)).toBe('correct'); // tens: 8-4=4
@@ -171,7 +171,7 @@ describe('problemStore — medium subtraction auto-borrow', () => {
   });
 
   it('rejects wrong answer digit', () => {
-    start(makeSubtractionProblem(83, 45), 'medium');
+    start(makeSubtractionProblem(83, 45), 'some');
 
     expect(submit(5)).toBe('incorrect');
     // Borrow should NOT have been auto-completed
@@ -180,11 +180,11 @@ describe('problemStore — medium subtraction auto-borrow', () => {
   });
 });
 
-describe('problemStore — hard mode (no auto-complete)', () => {
+describe('problemStore — no-support mode (no auto-complete)', () => {
   beforeEach(() => useProblemStore.getState().reset());
 
   it('addition: requires manual carry entry', () => {
-    start(makeAdditionProblem([45, 38]), 'hard');
+    start(makeAdditionProblem([45, 38]), 'none');
 
     // Ones: answer 3
     expect(submit(3)).toBe('correct');
@@ -202,18 +202,18 @@ describe('problemStore — hard mode (no auto-complete)', () => {
     expect(state().isComplete).toBe(true);
   });
 
-  it('subtraction: does not skip borrow step on hard', () => {
-    start(makeSubtractionProblem(83, 45), 'hard');
+  it('subtraction: does not skip borrow step', () => {
+    start(makeSubtractionProblem(83, 45), 'none');
 
-    // First step should be borrow (not skipped like on medium)
+    // First step should be borrow (not skipped like on some-support)
     const first = state().steps[state().currentStepIndex];
     expect(first.type).toBe('borrow');
     expect(first.correctValue).toBe(13);
   });
 
-  it('subtraction without borrow works on hard', () => {
+  it('subtraction without borrow works', () => {
     // 86 - 42 = 44, no borrows
-    start(makeSubtractionProblem(86, 42), 'hard');
+    start(makeSubtractionProblem(86, 42), 'none');
 
     const first = state().steps[state().currentStepIndex];
     expect(first.type).toBe('answer_digit');
@@ -224,7 +224,7 @@ describe('problemStore — hard mode (no auto-complete)', () => {
   });
 
   it('addition: wrong digit does not complete step', () => {
-    start(makeAdditionProblem([45, 38]), 'hard');
+    start(makeAdditionProblem([45, 38]), 'none');
 
     expect(submit(5)).toBe('incorrect');
     expect(state().steps[state().currentStepIndex].status).toBe('active');
@@ -232,11 +232,11 @@ describe('problemStore — hard mode (no auto-complete)', () => {
   });
 });
 
-describe('problemStore — easy mode', () => {
+describe('problemStore — full-support mode', () => {
   beforeEach(() => useProblemStore.getState().reset());
 
   it('nextStep advances and completes steps', () => {
-    start(makeAdditionProblem([45, 38]), 'easy');
+    start(makeAdditionProblem([45, 38]), 'full');
     const store = useProblemStore.getState();
 
     store.nextStep();

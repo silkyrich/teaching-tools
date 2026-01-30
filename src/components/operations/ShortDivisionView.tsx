@@ -10,13 +10,13 @@ interface ShortDivisionViewProps {
 
 export function ShortDivisionView({ errorStepId }: ShortDivisionViewProps) {
   const problemState = useProblemStore(s => s.problemState);
-  const difficulty = useUiStore(s => s.difficulty);
+  const support = useUiStore(s => s.support);
 
   const cells = useMemo(() => {
     if (!problemState) return [];
     const [divisor, dividend] = problemState.problem.operands;
-    return getShortDivisionGridCells(divisor, dividend, problemState.steps, difficulty === 'easy');
-  }, [problemState, difficulty]);
+    return getShortDivisionGridCells(divisor, dividend, problemState.steps, support === 'full');
+  }, [problemState, support]);
 
   const layout = useMemo(() => {
     if (!problemState) return null;

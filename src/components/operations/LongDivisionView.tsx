@@ -10,13 +10,13 @@ interface LongDivisionViewProps {
 
 export function LongDivisionView({ errorStepId }: LongDivisionViewProps) {
   const problemState = useProblemStore(s => s.problemState);
-  const difficulty = useUiStore(s => s.difficulty);
+  const support = useUiStore(s => s.support);
 
   const cells = useMemo(() => {
     if (!problemState) return [];
     const [divisor, dividend] = problemState.problem.operands;
-    return getLongDivisionGridCells(divisor, dividend, problemState.steps, difficulty === 'easy');
-  }, [problemState, difficulty]);
+    return getLongDivisionGridCells(divisor, dividend, problemState.steps, support === 'full');
+  }, [problemState, support]);
 
   const layoutInfo = useMemo(() => {
     if (!problemState) return null;

@@ -1,19 +1,19 @@
 import { create } from 'zustand';
-import type { Problem, ProblemState, StepInput, Difficulty } from '../engines/types';
+import type { Problem, ProblemState, StepInput, Support } from '../engines/types';
 
 interface ProblemStore {
   problemState: ProblemState | null;
-  startProblem: (problem: Problem, steps: StepInput[], difficulty: Difficulty) => void;
-  startProblemAtStep: (problem: Problem, steps: StepInput[], difficulty: Difficulty, stepIndex: number) => void;
+  startProblem: (problem: Problem, steps: StepInput[], support: Support) => void;
+  startProblemAtStep: (problem: Problem, steps: StepInput[], support: Support, stepIndex: number) => void;
   submitDigit: (digit: number) => 'correct' | 'incorrect' | 'ignored';
   nextStep: () => void;
   reset: () => void;
 }
 
-function findNextActiveIndex(steps: StepInput[], fromIndex: number, difficulty: Difficulty): number {
+function findNextActiveIndex(steps: StepInput[], fromIndex: number, support: Support): number {
   let idx = fromIndex + 1;
-  // On medium difficulty, skip borrow steps (they auto-complete when the linked answer is entered)
-  if (difficulty === 'medium') {
+  // On 'some' support, skip borrow steps (they auto-complete when the linked answer is entered)
+  if (support === 'some') {
     while (idx < steps.length && steps[idx].type === 'borrow' && steps[idx].linkedStepId) {
       idx++;
     }
@@ -22,7 +22,7 @@ function findNextActiveIndex(steps: StepInput[], fromIndex: number, difficulty: 
 }
 
 function advanceToNext(state: ProblemState, newSteps: StepInput[], fromIndex: number): ProblemState {
-  const nextIndex = findNextActiveIndex(newSteps, fromIndex, state.difficulty);
+  const nextIndex = findNextActiveIndex(newSteps, fromIndex, state.support);
   const isComplete = nextIndex >= newSteps.length;
 
   if (!isComplete && newSteps[nextIndex]) {
@@ -80,10 +80,10 @@ function completeLinkedSteps(
 export const useProblemStore = create<ProblemStore>((set, get) => ({
   problemState: null,
 
-  startProblem: (problem, steps, difficulty) => {
-    // On medium, find the first non-borrow step to activate
+  startProblem: (problem, steps, support) => {
+    // On 'some' support, find the first non-borrow step to activate
     let firstActiveIndex = 0;
-    if (difficulty === 'medium') {
+    if (support === 'some') {
       while (firstActiveIndex < steps.length && steps[firstActiveIndex].type === 'borrow' && steps[firstActiveIndex].linkedStepId) {
         firstActiveIndex++;
       }
@@ -98,7 +98,7 @@ export const useProblemStore = create<ProblemStore>((set, get) => ({
     set({
       problemState: {
         problem,
-        difficulty,
+        support,
         steps: initialSteps,
         currentStepIndex: firstActiveIndex,
         isComplete: false,
@@ -109,7 +109,7 @@ export const useProblemStore = create<ProblemStore>((set, get) => ({
     });
   },
 
-  startProblemAtStep: (problem, steps, difficulty, stepIndex) => {
+  startProblemAtStep: (problem, steps, support, stepIndex) => {
     const clampedIndex = Math.min(stepIndex, steps.length);
     const isComplete = clampedIndex >= steps.length;
 
@@ -124,7 +124,7 @@ export const useProblemStore = create<ProblemStore>((set, get) => ({
     set({
       problemState: {
         problem,
-        difficulty,
+        support,
         steps: initialSteps,
         currentStepIndex: isComplete ? clampedIndex - 1 : clampedIndex,
         isComplete,
@@ -142,7 +142,7 @@ export const useProblemStore = create<ProblemStore>((set, get) => ({
     const currentStep = state.steps[state.currentStepIndex];
     if (!currentStep || currentStep.status !== 'active') return 'ignored';
 
-    const isMedium = state.difficulty === 'medium';
+    const isMedium = state.support === 'some';
 
     // Medium difficulty compound entry for addition (carry auto-populates)
     if (isMedium && currentStep.compoundValue !== undefined && currentStep.compoundValue >= 10) {
@@ -244,7 +244,7 @@ export const useProblemStore = create<ProblemStore>((set, get) => ({
     // Standard behavior (hard mode, or medium without compound)
     const isCorrect = digit === currentStep.correctValue;
 
-    if (state.difficulty === 'medium' && !isCorrect) {
+    if (state.support === 'some' && !isCorrect) {
       return 'incorrect';
     }
 
