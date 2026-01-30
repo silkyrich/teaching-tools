@@ -2,11 +2,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: var(--border-radius-sm);
+  width: var(--cell-size, 56px);
+  height: var(--cell-size, 56px);
+  border-radius: var(--cell-border-radius);
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: var(--cell-font, 28px);
   transition: all var(--transition-fast);
   user-select: none;
   position: relative;
@@ -18,13 +18,13 @@
 
 .operator {
   color: var(--color-operator);
-  font-size: 24px;
+  font-size: var(--cell-font, 24px);
 }
 
 .editable {
   background: var(--color-digit-cell-bg);
   border: 2px solid var(--color-digit-cell-border);
-  min-height: 56px;
+  min-height: var(--cell-size, 56px);
 }
 
 .pending {
@@ -36,7 +36,7 @@
   background: var(--color-digit-cell-active-bg);
   border-color: var(--color-digit-cell-active-border);
   animation: pulse 1.5s ease-in-out infinite;
-  box-shadow: var(--shadow-glow);
+  box-shadow: var(--cell-shadow-active);
 }
 
 .completed {
@@ -54,9 +54,9 @@
 }
 
 .carry {
-  width: 32px;
-  height: 32px;
-  font-size: 18px;
+  width: var(--carry-size, 32px);
+  height: var(--carry-size, 32px);
+  font-size: var(--carry-font, 18px);
   color: var(--color-carry);
   background: var(--color-carry-bg);
   border: 1.5px solid var(--color-carry);
@@ -82,9 +82,9 @@
 }
 
 .borrow {
-  width: 32px;
-  height: 32px;
-  font-size: 18px;
+  width: var(--carry-size, 32px);
+  height: var(--carry-size, 32px);
+  font-size: var(--carry-font, 18px);
   color: var(--color-borrow);
   background: var(--color-borrow-bg);
   border: 1.5px solid var(--color-borrow);

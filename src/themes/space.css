@@ -1,0 +1,58 @@
+[data-theme="space"] {
+  --color-bg: #0b0d1a;
+  --color-bg-gradient: linear-gradient(180deg, #0b0d1a 0%, #06070f 100%);
+  --color-surface: #161830;
+  --color-surface-raised: #1e2142;
+  --color-primary: #7c4dff;
+  --color-primary-hover: #9e7bff;
+  --color-primary-light: #b39ddb;
+  --color-accent: #00e5ff;
+  --color-accent-light: #80f0ff;
+  --color-text: #e8eaf6;
+  --color-text-muted: #9fa8da;
+  --color-text-on-primary: #0b0d1a;
+  --color-digit-cell-bg: #1a1d3a;
+  --color-digit-cell-border: #7c4dff;
+  --color-digit-cell-active-bg: #252850;
+  --color-digit-cell-active-border: #9e7bff;
+  --color-digit-cell-completed-bg: #1c1f40;
+  --color-carry: #00e5ff;
+  --color-carry-bg: rgba(0, 229, 255, 0.12);
+  --color-borrow: #ff9800;
+  --color-borrow-bg: rgba(255, 152, 0, 0.12);
+  --color-error: #ff5252;
+  --color-error-bg: rgba(255, 82, 82, 0.12);
+  --color-success: #69f0ae;
+  --color-success-bg: rgba(105, 240, 174, 0.12);
+  --color-line: #7c4dff;
+  --color-numpad-bg: #0f1125;
+  --color-numpad-button: #1a1d3a;
+  --color-numpad-button-hover: #252850;
+  --color-numpad-button-active: #161830;
+  --color-numpad-button-text: #e8eaf6;
+  --color-operator: #b39ddb;
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 12px rgba(124, 77, 255, 0.4);
+
+  /* Decorative — starfield */
+  --bg-pattern:
+    radial-gradient(circle 1px at 10% 15%, rgba(255, 255, 255, 0.6) 0%, transparent 100%),
+    radial-gradient(circle 1px at 30% 45%, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
+    radial-gradient(circle 2px at 55% 10%, rgba(200, 200, 255, 0.5) 0%, transparent 100%),
+    radial-gradient(circle 1px at 70% 60%, rgba(255, 255, 255, 0.5) 0%, transparent 100%),
+    radial-gradient(circle 1px at 85% 25%, rgba(255, 255, 255, 0.3) 0%, transparent 100%),
+    radial-gradient(circle 1px at 20% 80%, rgba(200, 180, 255, 0.4) 0%, transparent 100%),
+    radial-gradient(circle 2px at 45% 55%, rgba(0, 229, 255, 0.3) 0%, transparent 100%),
+    radial-gradient(circle 1px at 90% 75%, rgba(255, 255, 255, 0.5) 0%, transparent 100%),
+    radial-gradient(circle 1px at 5% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 65% 85%, rgba(124, 77, 255, 0.4) 0%, transparent 100%);
+  --bg-pattern-opacity: 1;
+  --cell-border-radius: 6px;
+  --button-border-radius: 10px;
+  --header-border-bottom: 1px solid rgba(124, 77, 255, 0.3);
+  --divider-height: 2px;
+  --divider-style: linear-gradient(90deg, transparent, var(--color-line), var(--color-accent), var(--color-line), transparent);
+  --cell-shadow-active: 0 0 16px rgba(124, 77, 255, 0.5), 0 0 4px rgba(0, 229, 255, 0.3);
+  --numpad-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 2px rgba(124, 77, 255, 0.15);
+}

@@ -22,14 +22,14 @@
   justify-content: center;
   height: 60px;
   border: none;
-  border-radius: var(--border-radius);
+  border-radius: var(--button-border-radius);
   background: var(--color-numpad-button);
   color: var(--color-numpad-button-text);
   font-family: var(--font-display);
   font-size: 28px;
   cursor: pointer;
   transition: all var(--transition-fast);
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--numpad-shadow);
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;

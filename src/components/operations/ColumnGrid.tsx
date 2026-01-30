@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import styles from './ColumnGrid.module.css';
 import { DigitCell } from './DigitCell';
 import type { GridCell } from '../../engines/types';
@@ -21,6 +22,14 @@ export function ColumnGrid({
   totalSteps,
   errorStepId,
 }: ColumnGridProps) {
+  // Compute responsive cell size: fit cols within available width (max 60px)
+  const cellSize = useMemo(() => {
+    const maxWidth = Math.min(window.innerWidth - 40, 600); // 20px padding each side
+    const gap = 4;
+    const available = maxWidth - gap * (cols - 1);
+    return Math.min(60, Math.floor(available / cols));
+  }, [cols]);
+
   // Build a 2D map for positioning, separating main and carry layers
   const mainCells: (GridCell | null)[][] = Array.from({ length: rows }, () =>
     Array(cols).fill(null)
@@ -63,7 +72,7 @@ export function ColumnGrid({
           {cell ? (
             <DigitCell cell={cell} showError={cell.stepId === errorStepId} />
           ) : (
-            <div style={{ width: 56, height: 56 }} />
+            <div style={{ width: cellSize - 4, height: cellSize - 4 }} />
           )}
           {r === 1 && carryCell && (carryCell.status === 'completed' || carryCell.status === 'active' || carryCell.status === 'tentative') && (
             <DigitCell cell={carryCell} showError={carryCell.stepId === errorStepId} />
@@ -78,9 +87,13 @@ export function ColumnGrid({
       <div
         className={styles.grid}
         style={{
-          gridTemplateColumns: `repeat(${cols}, 60px)`,
-          gridTemplateRows: `repeat(${rows}, 60px)`,
-        }}
+          gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
+          gridTemplateRows: `repeat(${rows}, ${cellSize}px)`,
+          '--cell-size': `${cellSize - 4}px`,
+          '--cell-font': `${Math.max(16, Math.floor(cellSize * 0.45))}px`,
+          '--carry-size': `${Math.max(22, Math.floor(cellSize * 0.5))}px`,
+          '--carry-font': `${Math.max(12, Math.floor(cellSize * 0.28))}px`,
+        } as React.CSSProperties}
       >
         {gridRows}
       </div>

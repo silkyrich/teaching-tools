@@ -1,0 +1,56 @@
+[data-theme="arctic"] {
+  --color-bg: #0d1520;
+  --color-bg-gradient: linear-gradient(180deg, #0d1520 0%, #0a1018 100%);
+  --color-surface: #162030;
+  --color-surface-raised: #1e2d42;
+  --color-primary: #4fc3f7;
+  --color-primary-hover: #81d4fa;
+  --color-primary-light: #b3e5fc;
+  --color-accent: #e0e0e0;
+  --color-accent-light: #f5f5f5;
+  --color-text: #eceff1;
+  --color-text-muted: #90a4ae;
+  --color-text-on-primary: #0d1520;
+  --color-digit-cell-bg: #152535;
+  --color-digit-cell-border: #4fc3f7;
+  --color-digit-cell-active-bg: #1c3248;
+  --color-digit-cell-active-border: #81d4fa;
+  --color-digit-cell-completed-bg: #182a3c;
+  --color-carry: #e0e0e0;
+  --color-carry-bg: rgba(224, 224, 224, 0.12);
+  --color-borrow: #ffab40;
+  --color-borrow-bg: rgba(255, 171, 64, 0.12);
+  --color-error: #ef5350;
+  --color-error-bg: rgba(239, 83, 80, 0.12);
+  --color-success: #69f0ae;
+  --color-success-bg: rgba(105, 240, 174, 0.12);
+  --color-line: #4fc3f7;
+  --color-numpad-bg: #0f1a28;
+  --color-numpad-button: #152535;
+  --color-numpad-button-hover: #1c3248;
+  --color-numpad-button-active: #162030;
+  --color-numpad-button-text: #eceff1;
+  --color-operator: #b3e5fc;
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 12px rgba(79, 195, 247, 0.3);
+
+  /* Decorative — frost crystals */
+  --bg-pattern:
+    radial-gradient(circle 30px at 15% 20%, rgba(79, 195, 247, 0.04) 0%, transparent 100%),
+    radial-gradient(circle 20px at 70% 15%, rgba(179, 229, 252, 0.03) 0%, transparent 100%),
+    radial-gradient(circle 25px at 40% 60%, rgba(79, 195, 247, 0.035) 0%, transparent 100%),
+    radial-gradient(circle 15px at 85% 50%, rgba(224, 224, 224, 0.03) 0%, transparent 100%),
+    radial-gradient(circle 35px at 25% 85%, rgba(79, 195, 247, 0.03) 0%, transparent 100%),
+    radial-gradient(circle 18px at 60% 80%, rgba(179, 229, 252, 0.025) 0%, transparent 100%),
+    linear-gradient(120deg, transparent 40%, rgba(79, 195, 247, 0.015) 50%, transparent 60%),
+    linear-gradient(240deg, transparent 30%, rgba(224, 224, 224, 0.01) 40%, transparent 50%);
+  --bg-pattern-opacity: 1;
+  --cell-border-radius: 6px;
+  --button-border-radius: 8px;
+  --header-border-bottom: 1px solid rgba(79, 195, 247, 0.2);
+  --divider-height: 2px;
+  --divider-style: linear-gradient(90deg, transparent, var(--color-line), rgba(224, 224, 224, 0.5), var(--color-line), transparent);
+  --cell-shadow-active: 0 0 14px rgba(79, 195, 247, 0.35), 0 0 6px rgba(224, 224, 224, 0.15);
+  --numpad-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 1px rgba(79, 195, 247, 0.1);
+}

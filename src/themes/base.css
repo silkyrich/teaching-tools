@@ -26,6 +26,17 @@ body {
   --border-radius-lg: 16px;
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
+
+  /* Decorative defaults (overridden per theme) */
+  --bg-pattern: none;
+  --bg-pattern-opacity: 0;
+  --cell-border-radius: 8px;
+  --button-border-radius: 12px;
+  --header-border-bottom: 1px solid var(--color-surface-raised);
+  --divider-height: 3px;
+  --divider-style: var(--color-line);
+  --cell-shadow-active: 0 0 12px rgba(100, 100, 100, 0.3);
+  --numpad-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Animations */

@@ -1,24 +1,37 @@
 import { create } from 'zustand';
 import type { Difficulty, Operation } from '../engines/types';
 
+export type Theme = 'forest' | 'ocean' | 'space' | 'candy' | 'volcano' | 'arctic';
+
+export const THEMES: { id: Theme; label: string; icon: string }[] = [
+  { id: 'forest', label: 'Forest', icon: '\u{1F332}' },
+  { id: 'ocean', label: 'Ocean', icon: '\u{1F30A}' },
+  { id: 'space', label: 'Space', icon: '\u{1F680}' },
+  { id: 'candy', label: 'Candy', icon: '\u{1F36C}' },
+  { id: 'volcano', label: 'Volcano', icon: '\u{1F30B}' },
+  { id: 'arctic', label: 'Arctic', icon: '\u{2744}\u{FE0F}' },
+];
+
+const THEME_IDS = new Set<string>(THEMES.map(t => t.id));
+
 type Screen = 'home' | 'problem' | 'setup';
 
 interface UiStore {
   screen: Screen;
-  theme: 'forest' | 'ocean';
+  theme: Theme;
   difficulty: Difficulty;
   operation: Operation | null;
   setScreen: (screen: Screen) => void;
-  setTheme: (theme: 'forest' | 'ocean') => void;
-  toggleTheme: () => void;
+  setTheme: (theme: Theme) => void;
+  nextTheme: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
   setOperation: (operation: Operation) => void;
 }
 
-function loadTheme(): 'forest' | 'ocean' {
+function loadTheme(): Theme {
   try {
     const saved = localStorage.getItem('maths-steps-theme');
-    if (saved === 'forest' || saved === 'ocean') return saved;
+    if (saved && THEME_IDS.has(saved)) return saved as Theme;
   } catch {}
   return 'forest';
 }
@@ -43,9 +56,11 @@ export const useUiStore = create<UiStore>((set, get) => ({
     document.documentElement.dataset.theme = theme;
     set({ theme });
   },
-  toggleTheme: () => {
-    const newTheme = get().theme === 'forest' ? 'ocean' : 'forest';
-    get().setTheme(newTheme);
+  nextTheme: () => {
+    const current = get().theme;
+    const idx = THEMES.findIndex(t => t.id === current);
+    const next = THEMES[(idx + 1) % THEMES.length];
+    get().setTheme(next.id);
   },
   setDifficulty: (difficulty) => {
     localStorage.setItem('maths-steps-difficulty', difficulty);

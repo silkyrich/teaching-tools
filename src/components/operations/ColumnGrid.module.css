@@ -25,8 +25,8 @@
 
 .line {
   grid-column: 1 / -1;
-  height: 3px;
-  background: var(--color-line);
+  height: var(--divider-height);
+  background: var(--divider-style);
   border-radius: 2px;
   margin: 4px 0;
 }
