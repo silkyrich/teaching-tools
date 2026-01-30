@@ -105,6 +105,7 @@ export function ColumnGrid({
           style={{
             gridTemplateColumns: `repeat(${cols}, ${CELL_SIZE}px)`,
             gridTemplateRows: `repeat(${rows}, ${CELL_SIZE}px)`,
+            minWidth: cols * CELL_SIZE + (cols - 1) * 4,
             '--cell-size': `${CELL_SIZE - 4}px`,
             '--cell-font': `${cellFontSize}px`,
             '--carry-size': `${carrySize}px`,
