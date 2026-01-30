@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import styles from './ColumnGrid.module.css';
 import { DigitCell } from './DigitCell';
 import type { GridCell } from '../../engines/types';
@@ -22,13 +22,30 @@ export function ColumnGrid({
   totalSteps,
   errorStepId,
 }: ColumnGridProps) {
-  // Compute responsive cell size: fit cols within available width (max 60px)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+    ro.observe(el);
+    // Set initial width
+    setContainerWidth(el.clientWidth);
+    return () => ro.disconnect();
+  }, []);
+
+  // Compute cell size from measured container width
   const cellSize = useMemo(() => {
-    const maxWidth = Math.min(window.innerWidth - 40, 600); // 20px padding each side
+    const maxWidth = Math.min(containerWidth || 300, 600);
     const gap = 4;
     const available = maxWidth - gap * (cols - 1);
-    return Math.min(60, Math.floor(available / cols));
-  }, [cols]);
+    return Math.min(60, Math.max(24, Math.floor(available / cols)));
+  }, [cols, containerWidth]);
 
   // Build a 2D map for positioning, separating main and carry layers
   const mainCells: (GridCell | null)[][] = Array.from({ length: rows }, () =>
@@ -83,16 +100,17 @@ export function ColumnGrid({
   }
 
   return (
-    <div className={styles.gridContainer}>
+    <div ref={containerRef} className={styles.gridContainer}>
       <div
         className={styles.grid}
         style={{
           gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
           gridTemplateRows: `repeat(${rows}, ${cellSize}px)`,
           '--cell-size': `${cellSize - 4}px`,
-          '--cell-font': `${Math.max(16, Math.floor(cellSize * 0.45))}px`,
-          '--carry-size': `${Math.max(22, Math.floor(cellSize * 0.5))}px`,
-          '--carry-font': `${Math.max(12, Math.floor(cellSize * 0.28))}px`,
+          '--cell-font': `${Math.max(14, Math.floor(cellSize * 0.45))}px`,
+          '--carry-size': `${Math.max(18, Math.floor(cellSize * 0.5))}px`,
+          '--carry-font': `${Math.max(10, Math.floor(cellSize * 0.28))}px`,
+          maxWidth: '100%',
         } as React.CSSProperties}
       >
         {gridRows}
