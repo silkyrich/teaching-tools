@@ -50,6 +50,21 @@
   min-height: 0;
 }
 
+/* Grid + buddy side by side */
+.gridWithBuddy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.buddySlot {
+  flex-shrink: 0;
+  align-self: flex-end;
+  padding-bottom: 12px;
+}
+
 .trainingPanel {
   flex-shrink: 0;
 }

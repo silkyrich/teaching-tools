@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import styles from './ColumnGrid.module.css';
 import { DigitCell } from './DigitCell';
+import { RocketProgress } from './RocketProgress';
 import type { GridCell } from '../../engines/types';
 
 interface ColumnGridProps {
@@ -138,9 +139,7 @@ export function ColumnGrid({
           {gridRows}
         </div>
       </div>
-      <div className={styles.stepProgress}>
-        Step {Math.min(currentStepIndex + 1, totalSteps)} of {totalSteps}
-      </div>
+      <RocketProgress current={Math.min(currentStepIndex + 1, totalSteps)} total={totalSteps} />
     </div>
   );
 }
