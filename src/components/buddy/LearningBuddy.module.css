@@ -1,12 +1,83 @@
+.buddyContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+
+/* Speech bubble */
+.speechBubble {
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: 12px;
+  padding: 10px 14px;
+  max-width: 220px;
+  position: relative;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary) 15%, transparent);
+  animation: bubbleIn 0.2s ease;
+}
+
+/* Speech bubble tail pointing down to buddy */
+.speechBubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--color-surface);
+}
+
+.speechBubble::before {
+  content: '';
+  position: absolute;
+  bottom: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid var(--color-primary);
+}
+
 .buddy {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
   user-select: none;
-  pointer-events: none;
   transition: transform 0.3s ease;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+
+.clickable {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.clickable:hover {
+  transform: scale(1.08);
+}
+
+.clickable:active {
+  transform: scale(0.95);
+}
+
+/* "tap me" hint text below buddy */
+.tapHint {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-align: center;
+  opacity: 0.7;
+  animation: tapPulse 2s ease-in-out infinite;
+  margin-top: 2px;
 }
 
 /* Helmet (head) */
@@ -135,4 +206,14 @@
 @keyframes armWave {
   0%, 100% { transform: rotate(0); }
   50% { transform: rotate(-30deg); }
+}
+
+@keyframes bubbleIn {
+  from { opacity: 0; transform: translateY(4px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes tapPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }

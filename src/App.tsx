@@ -4,7 +4,7 @@ import { OperationPicker } from './components/problem-setup/OperationPicker';
 import { CustomNumberEntry } from './components/problem-setup/CustomNumberEntry';
 import { OperationView } from './components/operations/OperationView';
 import { NumberPad } from './components/number-input/NumberPad';
-import { TrainingPanel } from './components/training/TrainingPanel';
+import { TrainingPanel, useHintState } from './components/training/TrainingPanel';
 import { LearningBuddy } from './components/buddy/LearningBuddy';
 import { Celebration } from './components/celebration/Celebration';
 import { useUiStore } from './stores/uiStore';
@@ -154,6 +154,7 @@ function App() {
 
   const currentOperation = useUiStore(s => s.operation);
   const effectiveBuddyMood = problemState?.isComplete ? 'celebrate' : buddyMood;
+  const { hintLevel, requestHint } = useHintState();
 
   return (
     <div className={styles.app}>
@@ -178,15 +179,16 @@ function App() {
                 <div className={styles.gridWithBuddy}>
                   <OperationView errorStepId={errorStepId} />
                   <div className={styles.buddySlot}>
-                    <LearningBuddy mood={effectiveBuddyMood} />
+                    <LearningBuddy
+                      mood={effectiveBuddyMood}
+                      onTap={trainingMode ? requestHint : undefined}
+                      speechBubble={trainingMode ? (
+                        <TrainingPanel hintLevel={hintLevel} onRequestHint={requestHint} />
+                      ) : undefined}
+                    />
                   </div>
                 </div>
               </div>
-              {trainingMode && (
-                <div className={styles.trainingPanel}>
-                  <TrainingPanel />
-                </div>
-              )}
             </div>
             <div className={styles.inputArea}>
               <NumberPad

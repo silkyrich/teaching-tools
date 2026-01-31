@@ -238,9 +238,17 @@ export function getLongDivisionStepExplanation(
     // Find the quotient digit for this group
     const prevAnswer = [...steps].slice(0, currentStepIndex).reverse().find(s => s.type === 'answer_digit');
     const q = prevAnswer ? prevAnswer.correctValue : 0;
+    const product = q * divisor;
+    const productDigits = toDigits(product);
+    if (productDigits.length === 1) {
+      return {
+        title: `Multiply ${q} × ${divisor}`,
+        detail: `${q} × ${divisor} = ${product}. Write it below.`,
+      };
+    }
     return {
-      title: `Multiply ${q} x ${divisor}`,
-      detail: `${q} x ${divisor} = ${q * divisor}. Write ${step.correctValue} in this position.`,
+      title: `Multiply ${q} × ${divisor}`,
+      detail: `${q} × ${divisor} = ${product}. Write this digit (${step.correctValue}) below.`,
     };
   }
 

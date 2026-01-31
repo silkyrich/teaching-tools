@@ -61,45 +61,18 @@
 
 .buddySlot {
   flex-shrink: 0;
-  align-self: flex-end;
-  padding-bottom: 12px;
-}
-
-.trainingPanel {
-  flex-shrink: 0;
+  align-self: flex-start;
+  padding-top: 8px;
 }
 
 .inputArea {
   flex-shrink: 0;
 }
 
-/* Wide viewport: grid + training side-by-side, input below */
 @media (min-width: 768px) {
-  .problemMain {
-    flex-direction: row;
-    align-items: stretch;
-  }
-
-  .problemArea {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .trainingPanel {
-    width: 320px;
-    flex-shrink: 0;
-    border-left: 1px solid var(--color-surface-raised);
-  }
-
   .inputArea {
     max-width: 480px;
     margin: 0 auto;
     width: 100%;
-  }
-}
-
-@media (min-width: 1024px) {
-  .trainingPanel {
-    width: 380px;
   }
 }
