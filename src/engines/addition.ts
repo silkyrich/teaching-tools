@@ -1,4 +1,4 @@
-import type { StepInput, GridCell } from './types';
+import type { StepInput, GridCell, StepExplanation, OperationLayout } from './types';
 
 function toDigits(n: number): number[] {
   return String(n).split('').map(Number);
@@ -181,4 +181,59 @@ export function getAdditionGridCells(
   }
 
   return cells;
+}
+
+export function getAdditionOperationLayout(operands: number[]): OperationLayout {
+  const layout = getAdditionLayout(operands);
+  const lastOperandRow = layout.operandRows[layout.operandRows.length - 1];
+  return { rows: layout.rows, cols: layout.cols, lineAfterRow: lastOperandRow };
+}
+
+export function getAdditionStepExplanation(
+  operands: number[],
+  steps: StepInput[],
+  currentStepIndex: number
+): StepExplanation {
+  const allDigits = operands.map(n => toDigits(n));
+  const maxLen = Math.max(...allDigits.map(d => d.length));
+  for (const d of allDigits) {
+    while (d.length < maxLen) d.unshift(0);
+  }
+
+  if (currentStepIndex >= steps.length) {
+    return { title: 'Complete!', detail: `The answer is ${operands.reduce((a, b) => a + b, 0)}.` };
+  }
+
+  const step = steps[currentStepIndex];
+  const colFromRight = maxLen - (step.position.col - 1);
+  const placeNames = ['ones', 'tens', 'hundreds', 'thousands', 'ten-thousands'];
+  const placeName = placeNames[colFromRight - 1] || `place ${colFromRight}`;
+
+  if (step.type === 'carry') {
+    const linkedStep = steps.find(s => s.id === step.linkedStepId);
+    if (linkedStep) {
+      const prevCol = maxLen - (linkedStep.position.col - 1);
+      const prevPlace = placeNames[prevCol - 1] || `place ${prevCol}`;
+      return {
+        title: `Write the carry`,
+        detail: `The ${prevPlace} column added up to 10 or more, so carry ${step.correctValue} to the ${placeName} column.`,
+      };
+    }
+    return { title: 'Write the carry', detail: `Carry ${step.correctValue} to the next column.` };
+  }
+
+  // answer_digit
+  const columnDigits = allDigits.map(d => d[step.position.col - 1]);
+  // Check if there was a carry into this column
+  const prevCarryStep = steps.find(
+    s => s.type === 'carry' && s.status === 'completed' && s.position.col === step.position.col
+  );
+  const carryIn = prevCarryStep ? prevCarryStep.correctValue : 0;
+  const parts = columnDigits.filter(d => d !== undefined);
+  const sumStr = [...parts, ...(carryIn > 0 ? [carryIn] : [])].join(' + ');
+
+  return {
+    title: `Add the ${placeName} column`,
+    detail: `${sumStr} = ${step.correctValue}${step.compoundValue !== undefined && step.compoundValue >= 10 ? ` (write ${step.correctValue}, carry ${Math.floor(step.compoundValue / 10)})` : ''}`,
+  };
 }

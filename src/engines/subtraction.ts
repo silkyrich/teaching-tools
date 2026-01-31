@@ -1,4 +1,4 @@
-import type { StepInput, GridCell } from './types';
+import type { StepInput, GridCell, StepExplanation, OperationLayout } from './types';
 
 function digits(n: number): number[] {
   return String(n).split('').map(Number);
@@ -177,4 +177,53 @@ export function getSubtractionGridCells(
   }
 
   return cells;
+}
+
+export function getSubtractionOperationLayout(operands: number[]): OperationLayout {
+  const [a, b] = operands;
+  const layout = getSubtractionLayout(a, b);
+  return { rows: layout.rows, cols: layout.cols, lineAfterRow: layout.operandBRow };
+}
+
+export function getSubtractionStepExplanation(
+  operands: number[],
+  steps: StepInput[],
+  currentStepIndex: number
+): StepExplanation {
+  const [a, b] = operands;
+  const digitsA = digits(a);
+  const digitsB = digits(b);
+  const maxLen = Math.max(digitsA.length, digitsB.length);
+  while (digitsA.length < maxLen) digitsA.unshift(0);
+  while (digitsB.length < maxLen) digitsB.unshift(0);
+
+  if (currentStepIndex >= steps.length) {
+    return { title: 'Complete!', detail: `The answer is ${a - b}.` };
+  }
+
+  const step = steps[currentStepIndex];
+  const col = step.position.col;
+  const colFromRight = maxLen - (col - 1);
+  const placeNames = ['ones', 'tens', 'hundreds', 'thousands', 'ten-thousands'];
+  const placeName = placeNames[colFromRight - 1] || `place ${colFromRight}`;
+
+  if (step.type === 'borrow') {
+    return {
+      title: `Borrow for the ${placeName} column`,
+      detail: `The top digit is smaller than the bottom, so borrow from the next column. The top becomes ${step.correctValue}.`,
+    };
+  }
+
+  const topDigit = digitsA[col - 1];
+  const bottomDigit = digitsB[col - 1];
+  // Check if we borrowed
+  const borrowStep = steps.find(
+    s => s.type === 'borrow' && s.position.col === col && s.status === 'completed'
+  );
+  const effectiveTop = borrowStep ? borrowStep.correctValue : topDigit;
+
+  return {
+    title: `Subtract the ${placeName} column`,
+    detail: `${effectiveTop} - ${bottomDigit} = ${step.correctValue}`,
+  };
 }

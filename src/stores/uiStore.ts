@@ -23,6 +23,7 @@ interface UiStore {
   numberSize: NumberSize;
   support: Support;
   inputMode: InputMode;
+  trainingMode: boolean;
   operation: Operation | null;
   setScreen: (screen: Screen) => void;
   setTheme: (theme: Theme) => void;
@@ -30,6 +31,7 @@ interface UiStore {
   setNumberSize: (ns: NumberSize) => void;
   setSupport: (s: Support) => void;
   setInputMode: (m: InputMode) => void;
+  setTrainingMode: (on: boolean) => void;
   setOperation: (operation: Operation) => void;
 }
 
@@ -81,12 +83,20 @@ function loadInputMode(): InputMode {
   return 'random';
 }
 
+function loadTrainingMode(): boolean {
+  try {
+    return localStorage.getItem('maths-steps-trainingMode') === 'true';
+  } catch {}
+  return false;
+}
+
 export const useUiStore = create<UiStore>((set, get) => ({
   screen: 'home',
   theme: loadTheme(),
   numberSize: loadNumberSize(),
   support: loadSupport(),
   inputMode: loadInputMode(),
+  trainingMode: loadTrainingMode(),
   operation: null,
 
   setScreen: (screen) => set({ screen }),
@@ -112,6 +122,10 @@ export const useUiStore = create<UiStore>((set, get) => ({
   setInputMode: (inputMode) => {
     localStorage.setItem('maths-steps-inputMode', inputMode);
     set({ inputMode });
+  },
+  setTrainingMode: (trainingMode) => {
+    localStorage.setItem('maths-steps-trainingMode', String(trainingMode));
+    set({ trainingMode });
   },
   setOperation: (operation) => set({ operation }),
 }));

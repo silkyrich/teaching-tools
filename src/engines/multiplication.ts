@@ -1,4 +1,4 @@
-import type { StepInput, GridCell } from './types';
+import type { StepInput, GridCell, StepExplanation, OperationLayout } from './types';
 
 function toDigits(n: number): number[] {
   return String(n).split('').map(Number);
@@ -179,4 +179,61 @@ export function getMultiplicationGridCells(
   }
 
   return cells;
+}
+
+export function getMultiplicationOperationLayout(operands: number[]): OperationLayout {
+  const [a, b] = operands;
+  const layout = getMultiplicationLayout(a, b);
+  return { rows: layout.rows, cols: layout.cols, lineAfterRow: layout.operandBRow };
+}
+
+export function getMultiplicationStepExplanation(
+  operands: number[],
+  steps: StepInput[],
+  currentStepIndex: number
+): StepExplanation {
+  const [a, b] = operands;
+  const digitsA = toDigits(a);
+  const digitsB = toDigits(b);
+
+  if (currentStepIndex >= steps.length) {
+    return { title: 'Complete!', detail: `The answer is ${a * b}.` };
+  }
+
+  const step = steps[currentStepIndex];
+
+  if (step.type === 'partial_product') {
+    // Determine which partial product row this belongs to
+    const layout = getMultiplicationLayout(a, b);
+    const partialIdx = step.position.row - layout.partialProductStartRow;
+    const bDigitIdx = digitsB.length - 1 - partialIdx;
+    const bDigit = digitsB[bDigitIdx];
+
+    // Figure which digit of A we're multiplying
+    const placeShift = partialIdx;
+    const aColFromRight = (layout.cols - 1 - step.position.col) - placeShift;
+    const aDigitIdx = digitsA.length - 1 - aColFromRight;
+    const aDigit = aDigitIdx >= 0 && aDigitIdx < digitsA.length ? digitsA[aDigitIdx] : null;
+
+    if (aDigit !== null) {
+      return {
+        title: `Multiply ${aDigit} x ${bDigit}`,
+        detail: `${aDigit} x ${bDigit} = ${aDigit * bDigit}. Write ${step.correctValue} in this position.`,
+      };
+    }
+
+    return {
+      title: 'Write carry',
+      detail: `Write ${step.correctValue} from the carried amount.`,
+    };
+  }
+
+  if (step.type === 'answer_digit') {
+    return {
+      title: 'Add partial products',
+      detail: `Add the partial products column to get ${step.correctValue}.`,
+    };
+  }
+
+  return { title: 'Next step', detail: `Enter ${step.correctValue}.` };
 }
