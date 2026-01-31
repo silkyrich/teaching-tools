@@ -1,4 +1,4 @@
-import type { StepInput, GridCell } from './types';
+import type { StepInput, GridCell, StepExplanation, OperationLayout } from './types';
 
 function toDigits(n: number): number[] {
   return String(n).split('').map(Number);
@@ -194,4 +194,66 @@ export function getLongDivisionGridCells(
   }
 
   return cells;
+}
+
+export function getLongDivisionOperationLayout(operands: number[]): OperationLayout {
+  const [divisor, dividend] = operands;
+  const layout = getLongDivisionLayout(divisor, dividend);
+  const totalRows = getLongDivisionTotalRows(divisor, dividend);
+  return { rows: totalRows, cols: layout.cols };
+}
+
+export function getLongDivisionStepExplanation(
+  operands: number[],
+  steps: StepInput[],
+  currentStepIndex: number
+): StepExplanation {
+  const [divisor, dividend] = operands;
+
+  if (currentStepIndex >= steps.length) {
+    const q = Math.floor(dividend / divisor);
+    const r = dividend % divisor;
+    return { title: 'Complete!', detail: `${dividend} / ${divisor} = ${q}${r > 0 ? ` remainder ${r}` : ''}.` };
+  }
+
+  const step = steps[currentStepIndex];
+
+  if (step.type === 'bring_down') {
+    return {
+      title: 'Bring down the next digit',
+      detail: `Bring down ${step.correctValue} next to the remainder to form the new working number.`,
+    };
+  }
+
+  if (step.type === 'answer_digit') {
+    // Find what the working number is at this point
+    // The quotient digit at this position
+    return {
+      title: `How many times does ${divisor} go in?`,
+      detail: `${divisor} goes in ${step.correctValue} time${step.correctValue !== 1 ? 's' : ''}. Write ${step.correctValue} in the quotient.`,
+    };
+  }
+
+  if (step.type === 'partial_product') {
+    // Find the quotient digit for this group
+    const prevAnswer = [...steps].slice(0, currentStepIndex).reverse().find(s => s.type === 'answer_digit');
+    const q = prevAnswer ? prevAnswer.correctValue : 0;
+    return {
+      title: `Multiply ${q} x ${divisor}`,
+      detail: `${q} x ${divisor} = ${q * divisor}. Write ${step.correctValue} in this position.`,
+    };
+  }
+
+  if (step.type === 'remainder') {
+    return {
+      title: 'Write the remainder',
+      detail: `Subtract to get the remainder: ${step.correctValue}.`,
+    };
+  }
+
+  // Working remainder (answer_digit on working layer)
+  return {
+    title: 'Subtract',
+    detail: `Subtract to get ${step.correctValue}. This becomes the new working number.`,
+  };
 }

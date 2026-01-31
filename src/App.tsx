@@ -2,12 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Header } from './components/layout/Header';
 import { OperationPicker } from './components/problem-setup/OperationPicker';
 import { CustomNumberEntry } from './components/problem-setup/CustomNumberEntry';
-import { AdditionView } from './components/operations/AdditionView';
-import { SubtractionView } from './components/operations/SubtractionView';
-import { MultiplicationView } from './components/operations/MultiplicationView';
-import { ShortDivisionView } from './components/operations/ShortDivisionView';
-import { LongDivisionView } from './components/operations/LongDivisionView';
+import { OperationView } from './components/operations/OperationView';
 import { NumberPad } from './components/number-input/NumberPad';
+import { TrainingPanel } from './components/training/TrainingPanel';
 import { Celebration } from './components/celebration/Celebration';
 import { useUiStore } from './stores/uiStore';
 import { useProblemStore } from './stores/problemStore';
@@ -39,28 +36,9 @@ function getStepsForProblem(operation: Operation, operands: number[]) {
   }
 }
 
-function OperationView({ errorStepId }: { errorStepId?: string | null }) {
-  const operation = useProblemStore(s => s.problemState?.problem.operation);
-
-  switch (operation) {
-    case 'addition':
-      return <AdditionView errorStepId={errorStepId} />;
-    case 'subtraction':
-      return <SubtractionView errorStepId={errorStepId} />;
-    case 'multiplication':
-      return <MultiplicationView errorStepId={errorStepId} />;
-    case 'shortDivision':
-      return <ShortDivisionView errorStepId={errorStepId} />;
-    case 'longDivision':
-      return <LongDivisionView errorStepId={errorStepId} />;
-    default:
-      return null;
-  }
-}
-
 function App() {
   const { screen, setScreen, setOperation, numberSize, support, inputMode,
-          setNumberSize, setSupport } = useUiStore();
+          setNumberSize, setSupport, trainingMode } = useUiStore();
   const { startProblem, startProblemAtStep } = useProblemStore();
   const { problemState, handleDigit, handleNext, errorStepId, isViewOnly } = useStepEngine();
   const { score, recordCorrect } = useScore();
@@ -190,9 +168,16 @@ function App() {
         )}
 
         {screen === 'problem' && problemState && (
-          <>
-            <div className={styles.problemArea}>
-              <OperationView errorStepId={errorStepId} />
+          <div className={styles.problemLayout}>
+            <div className={styles.problemMain}>
+              <div className={styles.problemArea}>
+                <OperationView errorStepId={errorStepId} />
+              </div>
+              {trainingMode && (
+                <div className={styles.trainingPanel}>
+                  <TrainingPanel />
+                </div>
+              )}
             </div>
             <div className={styles.inputArea}>
               <NumberPad
@@ -202,7 +187,7 @@ function App() {
                 disabled={problemState.isComplete}
               />
             </div>
-          </>
+          </div>
         )}
       </div>
 

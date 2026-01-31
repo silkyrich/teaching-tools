@@ -79,3 +79,29 @@ export interface ScoreData {
   streakBest: number;
   byOperation: Record<Operation, { correct: number; attempted: number }>;
 }
+
+export interface StepExplanation {
+  title: string;
+  detail: string;
+}
+
+export interface OperationLayout {
+  rows: number;
+  cols: number;
+  lineAfterRow?: number;
+}
+
+export interface OperationConfig {
+  getLayout: (operands: number[]) => OperationLayout;
+  getCells: (
+    operands: number[],
+    steps: StepInput[],
+    showHints: boolean,
+    pendingFirstDigit: number | null
+  ) => GridCell[];
+  getStepExplanation: (
+    operands: number[],
+    steps: StepInput[],
+    currentStepIndex: number
+  ) => StepExplanation;
+}

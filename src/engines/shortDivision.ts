@@ -1,4 +1,4 @@
-import type { StepInput, GridCell } from './types';
+import type { StepInput, GridCell, StepExplanation, OperationLayout } from './types';
 
 function digits(n: number): number[] {
   return String(n).split('').map(Number);
@@ -158,4 +158,66 @@ export function getShortDivisionGridCells(
   }
 
   return cells;
+}
+
+export function getShortDivisionOperationLayout(operands: number[]): OperationLayout {
+  const [divisor, dividend] = operands;
+  const layout = getShortDivisionLayout(divisor, dividend);
+  return { rows: layout.rows, cols: layout.cols };
+}
+
+export function getShortDivisionStepExplanation(
+  operands: number[],
+  steps: StepInput[],
+  currentStepIndex: number
+): StepExplanation {
+  const [divisor, dividend] = operands;
+  const dividendDigits = digits(dividend);
+
+  if (currentStepIndex >= steps.length) {
+    const q = Math.floor(dividend / divisor);
+    const r = dividend % divisor;
+    return { title: 'Complete!', detail: `${dividend} / ${divisor} = ${q}${r > 0 ? ` remainder ${r}` : ''}.` };
+  }
+
+  const step = steps[currentStepIndex];
+  const layout = getShortDivisionLayout(divisor, dividend);
+  const digitIndex = step.position.col - layout.firstDigitCol;
+
+  if (step.type === 'answer_digit') {
+    // Find if there was a carried remainder from the previous digit
+    let carry = 0;
+    if (digitIndex > 0) {
+      const prevRemStep = steps.find(
+        s => s.type === 'remainder' && s.position.col === step.position.col - 1 && s.status === 'completed'
+      );
+      if (prevRemStep) carry = prevRemStep.correctValue;
+    }
+    const current = carry * 10 + dividendDigits[digitIndex];
+    return {
+      title: `Divide ${current} by ${divisor}`,
+      detail: `${current} / ${divisor} = ${step.correctValue} (${step.correctValue} x ${divisor} = ${step.correctValue * divisor})`,
+    };
+  }
+
+  if (step.type === 'remainder') {
+    if (step.label === 'r') {
+      return {
+        title: 'Final remainder',
+        detail: `The remainder is ${step.correctValue}. Write r${step.correctValue}.`,
+      };
+    }
+    const current = digits(dividend)[digitIndex];
+    // Find the quotient step just before
+    const prevQStep = steps.find(
+      s => s.type === 'answer_digit' && s.position.col === step.position.col
+    );
+    const q = prevQStep ? prevQStep.correctValue : 0;
+    return {
+      title: 'Write the remainder',
+      detail: `${q} x ${divisor} = ${q * divisor}, remainder ${step.correctValue}. Carry ${step.correctValue} to the next digit.`,
+    };
+  }
+
+  return { title: 'Next step', detail: `Enter ${step.correctValue}.` };
 }

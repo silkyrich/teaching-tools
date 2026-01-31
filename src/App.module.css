@@ -26,14 +26,65 @@
   z-index: 1;
 }
 
+/* Problem screen layout */
+.problemLayout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.problemMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .problemArea {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 0;
+}
+
+.trainingPanel {
+  flex-shrink: 0;
 }
 
 .inputArea {
   flex-shrink: 0;
+}
+
+/* Wide viewport: grid + training side-by-side, input below */
+@media (min-width: 768px) {
+  .problemMain {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .problemArea {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .trainingPanel {
+    width: 320px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--color-surface-raised);
+  }
+
+  .inputArea {
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .trainingPanel {
+    width: 380px;
+  }
 }

@@ -33,8 +33,13 @@ const INPUT_MODE_OPTIONS: { value: InputMode; label: string }[] = [
   { value: 'custom', label: 'Custom' },
 ];
 
+const TRAINING_OPTIONS: { value: string; label: string }[] = [
+  { value: 'off', label: 'Off' },
+  { value: 'on', label: 'On' },
+];
+
 export function OperationPicker({ onSelect }: OperationPickerProps) {
-  const { numberSize, setNumberSize, support, setSupport, inputMode, setInputMode } = useUiStore();
+  const { numberSize, setNumberSize, support, setSupport, inputMode, setInputMode, trainingMode, setTrainingMode } = useUiStore();
   const { score } = useScore();
 
   return (
@@ -74,6 +79,12 @@ export function OperationPicker({ onSelect }: OperationPickerProps) {
           options={INPUT_MODE_OPTIONS}
           value={inputMode}
           onChange={setInputMode}
+        />
+        <SegmentedSelector
+          label="Guide Me"
+          options={TRAINING_OPTIONS}
+          value={trainingMode ? 'on' : 'off'}
+          onChange={(v) => setTrainingMode(v === 'on')}
         />
       </div>
 
