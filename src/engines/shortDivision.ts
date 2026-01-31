@@ -207,7 +207,6 @@ export function getShortDivisionStepExplanation(
         detail: `The remainder is ${step.correctValue}. Write r${step.correctValue}.`,
       };
     }
-    const current = digits(dividend)[digitIndex];
     // Find the quotient step just before
     const prevQStep = steps.find(
       s => s.type === 'answer_digit' && s.position.col === step.position.col

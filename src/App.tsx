@@ -5,12 +5,14 @@ import { CustomNumberEntry } from './components/problem-setup/CustomNumberEntry'
 import { OperationView } from './components/operations/OperationView';
 import { NumberPad } from './components/number-input/NumberPad';
 import { TrainingPanel } from './components/training/TrainingPanel';
+import { LearningBuddy } from './components/buddy/LearningBuddy';
 import { Celebration } from './components/celebration/Celebration';
 import { useUiStore } from './stores/uiStore';
 import { useProblemStore } from './stores/problemStore';
 import { useStepEngine } from './hooks/useStepEngine';
 import { useScore } from './hooks/useScore';
 import { useCelebration } from './hooks/useCelebration';
+import { playComplete } from './utils/sounds';
 import { generateProblem, createProblemFromOperands } from './engines/problemGenerator';
 import { generateAdditionSteps } from './engines/addition';
 import { generateSubtractionSteps } from './engines/subtraction';
@@ -40,7 +42,7 @@ function App() {
   const { screen, setScreen, setOperation, numberSize, support, inputMode,
           setNumberSize, setSupport, trainingMode } = useUiStore();
   const { startProblem, startProblemAtStep } = useProblemStore();
-  const { problemState, handleDigit, handleNext, errorStepId, isViewOnly } = useStepEngine();
+  const { problemState, handleDigit, handleNext, errorStepId, buddyMood, isViewOnly } = useStepEngine();
   const { score, recordCorrect } = useScore();
   const { celebrate } = useCelebration();
   const [showCelebration, setShowCelebration] = useState(false);
@@ -145,11 +147,13 @@ function App() {
         recordCorrect(operation);
         celebrate(score.streakCurrent + 1);
       }
+      playComplete();
       setShowCelebration(true);
     }
   }, [problemState?.isComplete]);
 
   const currentOperation = useUiStore(s => s.operation);
+  const effectiveBuddyMood = problemState?.isComplete ? 'celebrate' : buddyMood;
 
   return (
     <div className={styles.app}>
@@ -171,7 +175,12 @@ function App() {
           <div className={styles.problemLayout}>
             <div className={styles.problemMain}>
               <div className={styles.problemArea}>
-                <OperationView errorStepId={errorStepId} />
+                <div className={styles.gridWithBuddy}>
+                  <OperationView errorStepId={errorStepId} />
+                  <div className={styles.buddySlot}>
+                    <LearningBuddy mood={effectiveBuddyMood} />
+                  </div>
+                </div>
               </div>
               {trainingMode && (
                 <div className={styles.trainingPanel}>

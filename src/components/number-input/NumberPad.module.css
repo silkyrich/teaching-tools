@@ -16,35 +16,56 @@
   width: 100%;
 }
 
+/* 3D bubble buttons */
 .button {
   display: flex;
   align-items: center;
   justify-content: center;
   height: clamp(48px, 8vh, 64px);
   border: none;
-  border-radius: var(--button-border-radius);
-  background: var(--color-numpad-button);
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-numpad-button) 100%, white 0%) 0%,
+      var(--color-numpad-button) 50%,
+      color-mix(in srgb, var(--color-numpad-button) 85%, black) 100%
+    );
   color: var(--color-numpad-button-text);
   font-family: var(--font-display);
   font-size: clamp(22px, 4vw, 28px);
   cursor: pointer;
-  transition: all var(--transition-fast);
-  box-shadow: var(--numpad-shadow);
+  transition: all 0.1s ease;
+  box-shadow:
+    0 4px 0 color-mix(in srgb, var(--color-numpad-button) 70%, black),
+    0 6px 12px rgba(0, 0, 0, 0.25);
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
+  position: relative;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
+/* Pressed: push down physically */
 .button:active {
-  transform: scale(0.92);
-  background: var(--color-numpad-button-active);
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--color-numpad-button) 70%, black),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-numpad-button-active) 100%, white 0%) 0%,
+      var(--color-numpad-button-active) 100%
+    );
 }
 
 @media (hover: hover) {
   .button:hover {
-    background: var(--color-numpad-button-hover);
     transform: translateY(-1px);
-    box-shadow: var(--shadow-medium);
+    box-shadow:
+      0 5px 0 color-mix(in srgb, var(--color-numpad-button) 70%, black),
+      0 8px 16px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -52,24 +73,36 @@
   animation: bounceButton 0.3s ease;
 }
 
-.clearButton {
-  background: var(--color-surface);
-  font-size: 16px;
-  font-family: var(--font-body);
-  font-weight: 700;
-}
-
+/* "Next Step" button — green / accent-colored */
 .nextButton {
-  background: var(--color-primary);
-  color: var(--color-text-on-primary);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-success) 100%, white 10%) 0%,
+      var(--color-success) 50%,
+      color-mix(in srgb, var(--color-success) 80%, black) 100%
+    );
+  color: var(--color-bg);
   font-size: 16px;
   font-family: var(--font-body);
   font-weight: 700;
   grid-column: 1 / -1;
+  box-shadow:
+    0 4px 0 color-mix(in srgb, var(--color-success) 60%, black),
+    0 6px 12px rgba(0, 0, 0, 0.25);
 }
 
 .nextButton:active {
-  background: var(--color-primary-hover);
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--color-success) 60%, black),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+  background:
+    linear-gradient(
+      180deg,
+      var(--color-success) 0%,
+      color-mix(in srgb, var(--color-success) 85%, black) 100%
+    );
 }
 
 .disabled {

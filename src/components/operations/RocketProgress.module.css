@@ -1,0 +1,84 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 280px;
+  margin: 12px auto 0;
+  padding: 0 8px;
+  position: relative;
+  height: 28px;
+}
+
+.track {
+  flex: 1;
+  height: 6px;
+  background: var(--color-surface-raised);
+  border-radius: 3px;
+  position: relative;
+  overflow: visible;
+}
+
+.fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: 3px;
+  transition: width 0.4s ease;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+.dot {
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-text-muted);
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.dotDone {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--color-accent) 50%, transparent);
+}
+
+.rocket {
+  position: absolute;
+  top: -8px;
+  transform: translateX(-50%);
+  transition: left 0.4s ease;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--color-primary) 50%, transparent));
+  z-index: 2;
+  line-height: 0;
+}
+
+.rocketLanded {
+  animation: rocketPop 0.5s ease;
+}
+
+.planet {
+  line-height: 0;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--color-accent) 40%, transparent));
+}
+
+/* Flame flicker on the rocket */
+.flame {
+  animation: flicker 0.3s ease-in-out infinite alternate;
+  transform-origin: center top;
+}
+
+@keyframes rocketPop {
+  0% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.4); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+@keyframes flicker {
+  0% { opacity: 0.7; transform: scaleY(0.85); }
+  100% { opacity: 1; transform: scaleY(1.1); }
+}
