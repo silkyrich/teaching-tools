@@ -216,15 +216,38 @@ export function getMultiplicationStepExplanation(
     const aDigit = aDigitIdx >= 0 && aDigitIdx < digitsA.length ? digitsA[aDigitIdx] : null;
 
     if (aDigit !== null) {
+      // Compute the carry from previous digits in this same partial product row
+      // by replaying the multiplication up to this point
+      let carry = 0;
+      for (let ai = digitsA.length - 1; ai > aDigitIdx; ai--) {
+        const prod = digitsA[ai] * bDigit + carry;
+        carry = Math.floor(prod / 10);
+      }
+      const total = aDigit * bDigit + carry;
+      const digit = total % 10;
+      const newCarry = Math.floor(total / 10);
+
+      if (carry > 0) {
+        const carryPart = newCarry > 0
+          ? ` Write ${digit}, carry ${newCarry}.`
+          : ` Write ${digit}.`;
+        return {
+          title: `Multiply ${aDigit} × ${bDigit}`,
+          detail: `${aDigit} × ${bDigit} = ${aDigit * bDigit}, plus ${carry} carried = ${total}.${carryPart}`,
+        };
+      }
+      const carryPart = newCarry > 0
+        ? ` Write ${digit}, carry ${newCarry}.`
+        : ` Write ${digit}.`;
       return {
-        title: `Multiply ${aDigit} x ${bDigit}`,
-        detail: `${aDigit} x ${bDigit} = ${aDigit * bDigit}. Write ${step.correctValue} in this position.`,
+        title: `Multiply ${aDigit} × ${bDigit}`,
+        detail: `${aDigit} × ${bDigit} = ${total}.${carryPart}`,
       };
     }
 
     return {
-      title: 'Write carry',
-      detail: `Write ${step.correctValue} from the carried amount.`,
+      title: 'Write the final carry',
+      detail: `The carried ${step.correctValue} has no more digits to multiply, so write it down.`,
     };
   }
 
