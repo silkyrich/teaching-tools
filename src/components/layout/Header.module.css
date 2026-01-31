@@ -47,6 +47,25 @@
   gap: 8px;
 }
 
+.fullscreenButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  touch-action: manipulation;
+}
+
+.fullscreenButton:active {
+  transform: scale(0.9);
+}
+
 .themePickerWrap {
   position: relative;
 }
